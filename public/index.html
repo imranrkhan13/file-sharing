@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vault · Send Files</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#f2f2f0;--w:#fff;--ink:#0f0f0f;--i2:#555;--i3:#999;
+  --bd:#e4e4e0;--ac:#f97316;
+  --bl:#2563eb;--bls:#eff4ff;
+  --gn:#16a34a;--gns:#f0fdf4;--rd:#dc2626;
+  --sh:0 2px 8px rgba(0,0,0,.06),0 0 0 1px rgba(0,0,0,.04);
+  --shh:0 8px 32px rgba(0,0,0,.10),0 0 0 1px rgba(0,0,0,.05);
+}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;-webkit-font-smoothing:antialiased;}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;height:58px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;background:rgba(242,242,240,.94);backdrop-filter:blur(20px);border-bottom:1px solid var(--bd);}
+.logo{font-size:17px;font-weight:800;letter-spacing:-.3px;display:flex;align-items:center;gap:6px;cursor:pointer;}
+.ldot{width:8px;height:8px;border-radius:50%;background:var(--ac);}
+.npill{background:var(--ink);color:#fff;padding:7px 15px;border-radius:100px;font-size:13px;font-weight:600;border:none;cursor:pointer;}
+.npill:hover{background:#333;}
+
+/* PAGES */
+.page{display:none;padding-top:58px;min-height:100vh;}
+.page.on{display:block;}
+
+/* HOME */
+.home{max-width:820px;margin:0 auto;padding:52px 20px 72px;}
+.tag{display:inline-flex;align-items:center;gap:6px;background:var(--w);border:1px solid var(--bd);border-radius:100px;padding:5px 12px 5px 8px;font-size:12px;font-weight:600;color:var(--i2);margin-bottom:22px;box-shadow:var(--sh);}
+.tdot{width:7px;height:7px;border-radius:50%;background:var(--gn);animation:glow 2s infinite;}
+@keyframes glow{0%,100%{box-shadow:0 0 0 3px rgba(22,163,74,.15)}50%{box-shadow:0 0 0 6px rgba(22,163,74,.06)}}
+h1{font-size:clamp(38px,8vw,72px);font-weight:900;line-height:1.02;letter-spacing:-2px;margin-bottom:14px;}
+h1 em{font-style:normal;color:var(--ac);}
+.sub{font-size:clamp(14px,2.5vw,17px);color:var(--i2);line-height:1.65;max-width:460px;margin-bottom:36px;}
+.cg{display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:540px;margin-bottom:56px;}
+.cc{background:var(--w);border-radius:20px;padding:26px 22px;cursor:pointer;transition:all .22s;box-shadow:var(--sh);border:1.5px solid transparent;}
+.cc:hover{box-shadow:var(--shh);transform:translateY(-3px);border-color:var(--ac);}
+.cci{width:46px;height:46px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:14px;}
+.si{background:#fff3eb;}.ri{background:var(--bls);}
+.cct{font-size:17px;font-weight:800;letter-spacing:-.3px;margin-bottom:4px;}
+.ccd{font-size:13px;color:var(--i2);line-height:1.5;}
+.arr{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;background:var(--ink);color:#fff;font-size:12px;margin-top:12px;transition:transform .2s;}
+.cc:hover .arr{transform:translateX(3px);}
+.how{background:var(--ink);border-radius:22px;padding:44px 36px;}
+.hlbl{font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:8px;}
+.ht{font-size:clamp(22px,4vw,30px);font-weight:900;letter-spacing:-1px;color:#fff;margin-bottom:32px;}
+.sg{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+.sc{background:rgba(255,255,255,.05);border-radius:16px;padding:20px;}
+.sn{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ac);margin-bottom:10px;}
+.stt{font-size:14px;font-weight:700;color:#fff;margin-bottom:5px;}
+.sd{font-size:12px;color:rgba(255,255,255,.45);line-height:1.6;}
+
+/* TRANSFER PAGES */
+.xw{max-width:500px;margin:0 auto;padding:30px 18px 72px;}
+.xh{display:flex;align-items:center;gap:11px;margin-bottom:26px;}
+.bk{width:36px;height:36px;border-radius:50%;background:var(--w);border:1.5px solid var(--bd);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;color:var(--i2);transition:all .2s;box-shadow:var(--sh);flex-shrink:0;}
+.bk:hover{border-color:var(--ink);color:var(--ink);}
+.xtit{font-size:24px;font-weight:900;letter-spacing:-.5px;}
+.xs{display:none;}
+.xs.on{display:block;animation:up .28s ease;}
+@keyframes up{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.card{background:var(--w);border-radius:20px;padding:22px;margin-bottom:11px;box-shadow:var(--sh);}
+.ct{font-size:17px;font-weight:800;letter-spacing:-.3px;margin-bottom:3px;}
+.csu{font-size:13px;color:var(--i2);margin-bottom:18px;line-height:1.5;}
+
+/* DROP ZONE */
+.dz{border:2px dashed var(--bd);border-radius:14px;padding:36px 14px;text-align:center;cursor:pointer;transition:all .22s;background:var(--bg);}
+.dz:hover,.dz.ov{border-color:var(--ac);background:#fff8f3;}
+.dze{font-size:32px;margin-bottom:9px;display:block;}
+.dzt{font-size:13px;font-weight:700;margin-bottom:3px;}
+.dzs{font-size:12px;color:var(--i3);}
+.fl{display:flex;flex-direction:column;gap:6px;margin-top:11px;}
+.fr{display:flex;align-items:center;gap:8px;background:var(--bg);border:1px solid var(--bd);border-radius:11px;padding:10px 11px;animation:up .2s;}
+.fe{width:32px;height:32px;border-radius:7px;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:500;flex-shrink:0;text-transform:uppercase;}
+.fn{font-weight:600;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.fsz{font-size:11px;color:var(--i3);}
+.fdel{margin-left:auto;width:22px;height:22px;border-radius:50%;border:1px solid var(--bd);background:none;cursor:pointer;color:var(--i3);font-size:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.fdel:hover{background:#fff0f0;border-color:var(--rd);color:var(--rd);}
+
+/* THE CODE — big 6 chars, tap to copy */
+.code-block{
+  background:var(--bg);border:2px solid var(--bd);border-radius:16px;
+  padding:20px 14px 14px;text-align:center;margin:14px 0;
+  cursor:pointer;transition:all .22s;-webkit-tap-highlight-color:transparent;user-select:none;
+}
+.code-block:hover{border-color:var(--bl);background:var(--bls);}
+.code-block:active{transform:scale(.98);}
+.clbl{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--i3);margin-bottom:10px;}
+.cval{
+  font-family:'JetBrains Mono',monospace;
+  font-size:clamp(42px,12vw,60px);
+  font-weight:500;letter-spacing:12px;
+  color:var(--bl);display:block;line-height:1;
+}
+.chint{font-size:12px;color:var(--i3);margin-top:10px;}
+
+/* CODE INPUT — big, clear */
+.ci{
+  display:block;width:100%;padding:16px 12px;
+  font-family:'JetBrains Mono',monospace;
+  font-size:clamp(34px,10vw,50px);font-weight:500;
+  letter-spacing:10px;text-align:center;text-transform:uppercase;
+  border:2px solid var(--bd);border-radius:14px;
+  background:var(--w);color:var(--ink);outline:none;
+  transition:border-color .2s;margin:12px 0;
+  caret-color:var(--bl);
+}
+.ci:focus{border-color:var(--bl);box-shadow:0 0 0 4px rgba(37,99,235,.08);}
+.ci::placeholder{color:var(--bd);letter-spacing:6px;font-size:clamp(24px,7vw,38px);}
+
+/* NOTICES */
+.nt{display:flex;align-items:flex-start;gap:9px;padding:11px 13px;border-radius:12px;font-size:13px;line-height:1.6;margin-bottom:10px;}
+.ni{font-size:15px;flex-shrink:0;margin-top:1px;}
+.nb{background:var(--bls);border:1px solid #bfdbfe;color:#1e40af;}
+.na{background:#fffbeb;border:1px solid #fde68a;color:#92400e;}
+.ng{background:var(--gns);border:1px solid #bbf7d0;color:#166534;}
+.nr{background:#fff5f5;border:1px solid #fecaca;color:#991b1b;}
+
+/* STATUS ROW */
+.strow{display:flex;align-items:center;gap:11px;background:var(--bg);border:1px solid var(--bd);border-radius:13px;padding:13px 15px;margin:10px 0;}
+.stico{font-size:22px;}
+.stt2{font-weight:700;font-size:13px;margin-bottom:1px;}
+.stp{font-size:12px;color:var(--i2);}
+
+/* SPINNER */
+.spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(37,99,235,.2);border-top-color:var(--bl);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:4px;}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* BUTTONS */
+.btn{display:flex;align-items:center;justify-content:center;gap:7px;padding:13px 22px;border-radius:13px;border:none;cursor:pointer;font-family:'Inter',sans-serif;font-weight:700;font-size:14px;transition:all .2s;width:100%;}
+.bd2{background:var(--ink);color:#fff;}
+.bd2:hover{background:#222;transform:translateY(-1px);}
+.btn:disabled{opacity:.35;pointer-events:none;}
+.mt{margin-top:10px;}
+
+/* PROGRESS */
+.pw{margin:13px 0;}
+.ptrack{height:5px;background:var(--bd);border-radius:100px;overflow:hidden;margin-bottom:6px;}
+.pfill{height:100%;border-radius:100px;background:var(--bl);transition:width .3s ease;}
+.pmeta{display:flex;justify-content:space-between;font-size:11px;font-family:'JetBrains Mono',monospace;}
+.ppct{color:var(--bl);font-weight:500;}.pspd{color:var(--i3);}
+.fpl{display:flex;flex-direction:column;gap:6px;margin-top:9px;}
+.fpi{background:var(--bg);border:1px solid var(--bd);border-radius:11px;padding:11px 13px;}
+.fpr{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+.fpn{font-weight:600;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:75%;}
+.fpp{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--i3);}
+.fpt{height:3px;background:var(--bd);border-radius:100px;overflow:hidden;}
+.fpf{height:100%;border-radius:100px;background:var(--bl);transition:width .3s;}
+
+/* RECV FILE */
+.rf{display:flex;align-items:center;gap:10px;background:var(--bg);border:1px solid var(--bd);border-radius:11px;padding:11px 12px;margin-bottom:7px;animation:up .3s;}
+.rfi{flex:1;min-width:0;}
+.rfn{font-weight:600;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.rfs{font-size:11px;color:var(--i3);}
+.rfp{margin-top:5px;}
+.dlb{padding:7px 13px;background:var(--gn);color:#fff;border:none;border-radius:100px;font-weight:700;font-size:12px;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:background .2s;}
+.dlb:hover{background:#15803d;}
+.dlb:disabled{opacity:.3;pointer-events:none;background:var(--i3);}
+
+/* DONE */
+.dw{text-align:center;padding:40px 14px;}
+.dc{width:68px;height:68px;border-radius:50%;background:var(--gns);border:2px solid #bbf7d0;display:flex;align-items:center;justify-content:center;font-size:30px;margin:0 auto 14px;animation:pop .5s cubic-bezier(.34,1.56,.64,1);}
+@keyframes pop{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+.dt{font-size:26px;font-weight:900;letter-spacing:-.5px;margin-bottom:7px;}
+.dp{font-size:14px;color:var(--i2);margin-bottom:22px;line-height:1.6;}
+
+/* RESPONSIVE */
+@media(max-width:540px){
+  .cg{grid-template-columns:1fr;}
+  .sg{grid-template-columns:1fr;gap:10px;}
+  .how{padding:30px 20px;border-radius:18px;}
+  .home{padding:40px 16px 60px;}
+  .xw{padding:22px 14px 64px;}
+  .card{padding:18px 15px;}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo" onclick="goHome()"><span class="ldot"></span>Vault</div>
+  <button class="npill" onclick="showPage('send')">Send a file →</button>
+</nav>
+
+<!-- HOME -->
+<div class="page on" id="pg-home">
+  <div class="home">
+    <div class="tag"><span class="tdot"></span> Works worldwide · No account · No storage</div>
+    <h1>Send files to<br><em>any device.</em><br>Anywhere.</h1>
+    <p class="sub">Share a 6-letter code. The other person types it in. Files fly over directly — encrypted, no cloud, no size limit.</p>
+    <div class="cg">
+      <div class="cc" onclick="showPage('send')">
+        <div class="cci si">📤</div>
+        <div class="cct">Send files</div>
+        <div class="ccd">Pick files, get a 6-letter code. Share it.</div>
+        <div class="arr">→</div>
+      </div>
+      <div class="cc" onclick="showPage('recv')">
+        <div class="cci ri">📥</div>
+        <div class="cct">Receive files</div>
+        <div class="ccd">Type the 6-letter code. Files arrive.</div>
+        <div class="arr">→</div>
+      </div>
+    </div>
+    <div class="how">
+      <div class="hlbl">How it works</div>
+      <div class="ht">Three steps. That's it.</div>
+      <div class="sg">
+        <div class="sc"><div class="sn">01</div><div class="stt">Sender picks files</div><div class="sd">A short 6-letter code appears instantly. Share it via WhatsApp, text, anything.</div></div>
+        <div class="sc"><div class="sn">02</div><div class="stt">Receiver types it in</div><div class="sd">Open Vault → Receive files → type the 6-letter code. Connection opens.</div></div>
+        <div class="sc"><div class="sn">03</div><div class="stt">Files arrive</div><div class="sd">Direct browser-to-browser. Encrypted, fast, any network, any country.</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SEND -->
+<div class="page" id="pg-send">
+  <div class="xw">
+    <div class="xh">
+      <button class="bk" onclick="goHome()">←</button>
+      <div class="xtit">Send files</div>
+    </div>
+
+    <div class="xs on" id="ss1">
+      <div class="card">
+        <div class="ct">Pick your files</div>
+        <div class="csu">Any type, any size. Drop or tap to browse.</div>
+        <div class="dz" id="dz" onclick="document.getElementById('fi').click()" ondragover="dzO(event)" ondragleave="dzL()" ondrop="dzD(event)">
+          <span class="dze">📁</span>
+          <div class="dzt">Drop files here or tap to browse</div>
+          <div class="dzs">Photos, videos, docs, ZIP — anything works</div>
+        </div>
+        <input type="file" id="fi" multiple style="display:none" onchange="addFiles(this.files)">
+        <div class="fl" id="flist"></div>
+      </div>
+      <button class="btn bd2 mt" id="btn-go" disabled onclick="initSend()">Get my code →</button>
+    </div>
+
+    <div class="xs" id="ss2">
+      <div class="card">
+        <div class="ct">Your code</div>
+        <div class="csu">Share with the receiver via WhatsApp, text, anything.</div>
+        <div id="s-status" class="nt na"><span class="ni"><span class="spin"></span></span><span id="s-st-txt"> Connecting…</span></div>
+        <div class="code-block" onclick="copyCode()" id="cblock">
+          <div class="clbl">Tap to copy</div>
+          <span class="cval" id="scode">······</span>
+          <div class="chint" id="shint">Generating your code…</div>
+        </div>
+        <div class="nt nb"><span class="ni">💬</span><span>Receiver: open Vault → <strong>Receive files</strong> → type this code.</span></div>
+      </div>
+      <div class="card">
+        <div class="strow">
+          <div class="stico">⏳</div>
+          <div><div class="stt2">Waiting for receiver…</div><div class="stp">Files send automatically once they connect</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="xs" id="ss3">
+      <div class="card">
+        <div class="ct">Sending…</div>
+        <div class="csu">Files are streaming to their device.</div>
+        <div class="strow">
+          <div class="stico" id="sico">⚡</div>
+          <div><div class="stt2" id="sh">Sending</div><div class="stp" id="sp">Encrypted direct transfer</div></div>
+        </div>
+        <div class="pw">
+          <div class="ptrack"><div class="pfill" id="spf" style="width:0%"></div></div>
+          <div class="pmeta"><span class="ppct" id="spct">0%</span><span class="pspd" id="sspd">—</span></div>
+        </div>
+        <div class="fpl" id="fpl"></div>
+      </div>
+    </div>
+
+    <div class="xs" id="ss4">
+      <div class="card">
+        <div class="dw">
+          <div class="dc">✓</div>
+          <div class="dt">All done!</div>
+          <div class="dp">Files arrived safely on their device.</div>
+          <button class="btn bd2" onclick="resetSend()">Send more files</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- RECEIVE -->
+<div class="page" id="pg-recv">
+  <div class="xw">
+    <div class="xh">
+      <button class="bk" onclick="goHome()">←</button>
+      <div class="xtit">Receive files</div>
+    </div>
+
+    <div class="xs on" id="rs1">
+      <div class="card">
+        <div class="ct">Enter the code</div>
+        <div class="csu">Ask the sender for their 6-letter code and type it here.</div>
+        <div class="nt nb"><span class="ni">💬</span><span>Sender opens Vault → Send files → gets a code → sends it to you.</span></div>
+        <input class="ci" type="text" id="rinput" maxlength="6" placeholder="AAAAAA"
+          autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false"
+          oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'');document.getElementById('rbtn').disabled=this.value.length<4">
+        <button class="btn bd2 mt" id="rbtn" disabled onclick="doConnect()">Connect →</button>
+      </div>
+    </div>
+
+    <div class="xs" id="rs2">
+      <div class="card">
+        <div class="ct">Connecting…</div>
+        <div class="csu">Opening a secure connection to the sender.</div>
+        <div class="strow">
+          <div class="stico">📡</div>
+          <div><div class="stt2" id="rh">Connecting</div><div class="stp" id="rp">Reaching the sender…</div></div>
+        </div>
+        <div id="rerr" style="display:none;margin-top:10px;"></div>
+      </div>
+    </div>
+
+    <div class="xs" id="rs3">
+      <div class="card">
+        <div class="ct" id="rtit">Receiving…</div>
+        <div class="csu" id="rsub">Files are coming in directly.</div>
+        <div class="pw" id="rpw" style="display:none">
+          <div class="ptrack"><div class="pfill" id="rpf" style="width:0%"></div></div>
+          <div class="pmeta"><span class="ppct" id="rpct">0%</span><span class="pspd" id="rspd">—</span></div>
+        </div>
+        <div id="rfl"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════
+// CONFIG
+// ════════════════════════════════════════════════════
+// WebSocket URL auto-detects: same host in production,
+// localhost:3000 in dev.
+const WS_URL = (() => {
+  const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
+  const host  = location.hostname === 'localhost' ? 'localhost:3000' : location.host;
+  return `${proto}//${host}`;
+})();
+
+const ICE_SERVERS = [
+  { urls: 'stun:stun.l.google.com:19302' },
+  { urls: 'stun:stun1.l.google.com:19302' },
+  { urls: 'stun:stun2.l.google.com:19302' },
+  { urls: 'stun:stun.cloudflare.com:3478' },
+  // Free TURN relay — ensures cross-network works everywhere
+  { urls: 'turn:openrelay.metered.ca:80',               username: 'openrelayproject', credential: 'openrelayproject' },
+  { urls: 'turn:openrelay.metered.ca:443',              username: 'openrelayproject', credential: 'openrelayproject' },
+  { urls: 'turn:openrelay.metered.ca:443?transport=tcp',username: 'openrelayproject', credential: 'openrelayproject' },
+];
+
+const CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+const CHUNK = 65536; // 64 KB
+
+// ════════════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════════════
+let ws   = null;
+let pc   = null;
+let dc   = null;
+let role = '';        // 'sender' | 'receiver'
+let myCode = '';
+let sFiles = [];
+let sTot=0, sSent=0, sStart=0;
+let rTot=0, rGot=0,  rStart=0;
+let rFiles=[], rDls=[], rN=0, rCur=null, rCurIdx=-1;
+
+// ════════════════════════════════════════════════════
+// ROUTING
+// ════════════════════════════════════════════════════
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('on'));
+  document.getElementById('pg-' + id).classList.add('on');
+  window.scrollTo(0, 0);
+}
+function sStep(n) {
+  document.querySelectorAll('#pg-send .xs').forEach(x => x.classList.remove('on'));
+  document.getElementById('ss' + n).classList.add('on');
+}
+function rStep(n) {
+  document.querySelectorAll('#pg-recv .xs').forEach(x => x.classList.remove('on'));
+  document.getElementById('rs' + n).classList.add('on');
+}
+function goHome() {
+  cleanup();
+  sFiles = []; renderFiles();
+  sStep(1); rStep(1);
+  document.getElementById('rinput').value = '';
+  document.getElementById('rbtn').disabled = true;
+  showPage('home');
+}
+
+// ════════════════════════════════════════════════════
+// CLEANUP
+// ════════════════════════════════════════════════════
+function cleanup() {
+  if (dc)  { try { dc.close();      } catch(e){} dc   = null; }
+  if (pc)  { try { pc.close();      } catch(e){} pc   = null; }
+  if (ws)  { try { ws.close();      } catch(e){} ws   = null; }
+  role = ''; myCode = '';
+}
+
+// ════════════════════════════════════════════════════
+// FILES
+// ════════════════════════════════════════════════════
+function dzO(e) { e.preventDefault(); document.getElementById('dz').classList.add('ov'); }
+function dzL()  { document.getElementById('dz').classList.remove('ov'); }
+function dzD(e) { e.preventDefault(); dzL(); addFiles(e.dataTransfer.files); }
+function addFiles(fl) {
+  for (const f of fl)
+    if (!sFiles.find(x => x.name === f.name && x.size === f.size)) sFiles.push(f);
+  renderFiles();
+}
+function rmFile(i) { sFiles.splice(i, 1); renderFiles(); }
+function renderFiles() {
+  document.getElementById('flist').innerHTML = sFiles.map((f, i) => `
+    <div class="fr">
+      <div class="fe">${f.name.split('.').pop().slice(0,4).toUpperCase()}</div>
+      <div style="flex:1;min-width:0">
+        <div class="fn">${esc(f.name)}</div>
+        <div class="fsz">${fmt(f.size)}</div>
+      </div>
+      <button class="fdel" onclick="rmFile(${i})">✕</button>
+    </div>`).join('');
+  document.getElementById('btn-go').disabled = sFiles.length === 0;
+}
+function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
+function fmt(b) {
+  if (b < 1024)       return b + ' B';
+  if (b < 1048576)    return (b/1024).toFixed(1)    + ' KB';
+  if (b < 1073741824) return (b/1048576).toFixed(1) + ' MB';
+  return (b/1073741824).toFixed(2) + ' GB';
+}
+
+// ════════════════════════════════════════════════════
+// SIGNALING — connect to OUR server
+// ════════════════════════════════════════════════════
+function openWS(onOpen) {
+  ws = new WebSocket(WS_URL);
+  ws.onopen  = onOpen;
+  ws.onerror = () => toast('❌ Cannot reach signaling server. Is the app running?');
+}
+function wsSend(msg) {
+  if (ws && ws.readyState === WebSocket.OPEN)
+    ws.send(JSON.stringify(msg));
+}
+
+// ════════════════════════════════════════════════════
+// SENDER
+// ════════════════════════════════════════════════════
+function initSend() {
+  role = 'sender';
+  myCode = randCode();
+  sStep(2);
+  setStatus('na', '<span class="spin"></span> Connecting to server…');
+
+  openWS(() => {
+    wsSend({ type: 'register', room: myCode });
+
+    ws.onmessage = async (e) => {
+      const msg = JSON.parse(e.data);
+
+      if (msg.type === 'registered') {
+        document.getElementById('scode').textContent = msg.code;
+        document.getElementById('shint').textContent = 'Tap to copy · Send via WhatsApp or text';
+        setStatus('ng', '✓ Code ready — share it with the receiver');
+      }
+
+      if (msg.type === 'error' && msg.message === 'code-taken') {
+        // Retry with new code
+        myCode = randCode();
+        wsSend({ type: 'register', room: myCode });
+        return;
+      }
+
+      if (msg.type === 'receiver-joined') {
+        await createOffer();
+      }
+
+      if (msg.type === 'answer') {
+        try { await pc.setRemoteDescription(new RTCSessionDescription(msg.sdp)); } catch(e) {}
+      }
+
+      if (msg.type === 'ice' && msg.from === 'receiver') {
+        try { await pc.addIceCandidate(new RTCIceCandidate(msg.candidate)); } catch(e) {}
+      }
+
+      if (msg.type === 'peer-left' && document.getElementById('ss3').classList.contains('on')) {
+        setSendStat('⚠️', 'Receiver disconnected', 'They may have closed the window');
+      }
+    };
+  });
+}
+
+async function createOffer() {
+  pc = new RTCPeerConnection({ iceServers: ICE_SERVERS });
+  dc = pc.createDataChannel('vault', { ordered: true });
+  setupSendDC();
+
+  pc.onicecandidate = e => {
+    if (e.candidate) wsSend({ type: 'ice', from: 'sender', candidate: e.candidate });
+  };
+
+  const offer = await pc.createOffer();
+  await pc.setLocalDescription(offer);
+  wsSend({ type: 'offer', sdp: pc.localDescription });
+}
+
+function setupSendDC() {
+  dc.onopen = () => {
+    sStep(3);
+    buildSendUI();
+    sendAll();
+  };
+  dc.onerror = e => setSendStat('❌', 'Error', String(e));
+  dc.onclose = () => {
+    if (document.getElementById('ss3').classList.contains('on'))
+      setSendStat('⚠️', 'Disconnected', 'Receiver closed the window');
+  };
+}
+
+function copyCode() {
+  const code = document.getElementById('scode').textContent.trim();
+  if (!code || code === '······') { toast('Not ready yet — wait a second'); return; }
+  const fallback = () => {
+    const t = document.createElement('textarea');
+    t.value = code; t.style.cssText = 'position:fixed;opacity:0';
+    document.body.appendChild(t); t.select();
+    document.execCommand('copy'); t.remove();
+    toast('✓ Copied: ' + code + '  — send it via WhatsApp!');
+  };
+  if (navigator.clipboard)
+    navigator.clipboard.writeText(code)
+      .then(() => toast('✓ Copied: ' + code + ' — send it via WhatsApp!'))
+      .catch(fallback);
+  else fallback();
+}
+
+// ════════════════════════════════════════════════════
+// RECEIVER
+// ════════════════════════════════════════════════════
+function doConnect() {
+  const code = document.getElementById('rinput').value.trim().toUpperCase();
+  if (code.length < 4) { toast('Enter the full code'); return; }
+  role = 'receiver'; myCode = code;
+  rStep(2);
+
+  openWS(() => {
+    wsSend({ type: 'join', room: code });
+
+    ws.onmessage = async (e) => {
+      const msg = JSON.parse(e.data);
+
+      if (msg.type === 'room-not-found') {
+        showRErr(
+          '❌ Code not found: <strong>' + code + '</strong><br><br>' +
+          'Check the code is correct and the sender still has Vault open.'
+        );
+        return;
+      }
+
+      if (msg.type === 'offer') {
+        pc = new RTCPeerConnection({ iceServers: ICE_SERVERS });
+
+        pc.onicecandidate = ev => {
+          if (ev.candidate) wsSend({ type: 'ice', from: 'receiver', candidate: ev.candidate });
+        };
+        pc.ondatachannel = ev => {
+          dc = ev.channel;
+          dc.binaryType = 'arraybuffer';
+          setupRecvDC();
+        };
+
+        await pc.setRemoteDescription(new RTCSessionDescription(msg.sdp));
+        const answer = await pc.createAnswer();
+        await pc.setLocalDescription(answer);
+        wsSend({ type: 'answer', sdp: pc.localDescription });
+      }
+
+      if (msg.type === 'ice' && msg.from === 'sender') {
+        try { await pc.addIceCandidate(new RTCIceCandidate(msg.candidate)); } catch(e) {}
+      }
+
+      if (msg.type === 'peer-left') {
+        if (!document.getElementById('rs3').classList.contains('on')) {
+          showRErr('⚠️ Sender disconnected before the transfer started. Ask them to try again.');
+        }
+      }
+    };
+  });
+}
+
+function setupRecvDC() {
+  dc.onopen = () => {
+    rStep(3);
+    rStart = Date.now();
+  };
+  dc.onmessage = onData;
+  dc.onerror   = e => showRErr('❌ Transfer error: ' + e);
+}
+
+// ════════════════════════════════════════════════════
+// SEND FILES
+// ════════════════════════════════════════════════════
+async function sendAll() {
+  sTot = sFiles.reduce((a, f) => a + f.size, 0);
+  sSent = 0; sStart = Date.now();
+  dc.send(JSON.stringify({ type: 'count', count: sFiles.length }));
+  await sleep(60);
+  for (let i = 0; i < sFiles.length; i++) await sendOne(sFiles[i], i);
+}
+
+async function sendOne(file, idx) {
+  dc.send(JSON.stringify({ type: 'meta', name: file.name, size: file.size, index: idx }));
+  await sleep(40);
+  let off = 0;
+  while (off < file.size) {
+    while (dc.bufferedAmount > 2 * 1024 * 1024) await sleep(20);
+    const buf = await readBuf(file.slice(off, off + CHUNK));
+    dc.send(buf);
+    off   += buf.byteLength;
+    sSent += buf.byteLength;
+    updSend(idx, Math.min(off, file.size), file.size);
+  }
+  dc.send(JSON.stringify({ type: 'done', index: idx }));
+  await sleep(40);
+}
+
+function readBuf(s) {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = e => res(e.target.result);
+    r.onerror = rej;
+    r.readAsArrayBuffer(s);
+  });
+}
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+function buildSendUI() {
+  document.getElementById('fpl').innerHTML = sFiles.map((f, i) => `
+    <div class="fpi">
+      <div class="fpr"><span class="fpn">${esc(f.name)}</span><span class="fpp" id="fpp${i}">0%</span></div>
+      <div class="fpt"><div class="fpf" id="fpb${i}" style="width:0%"></div></div>
+    </div>`).join('');
+}
+function updSend(idx, sent, size) {
+  const fp  = size > 0 ? sent / size * 100 : 0;
+  const b   = document.getElementById('fpb' + idx); if (b) b.style.width = fp + '%';
+  const p   = document.getElementById('fpp' + idx); if (p) p.textContent = fp.toFixed(0) + '%';
+  const tot = sTot > 0 ? sSent / sTot * 100 : 0;
+  document.getElementById('spf').style.width     = tot + '%';
+  document.getElementById('spct').textContent    = tot.toFixed(1) + '%';
+  const s = (Date.now() - sStart) / 1000;
+  document.getElementById('sspd').textContent    = fmt(s > 0 ? sSent / s : 0) + '/s';
+  if (tot >= 100) setTimeout(() => sStep(4), 500);
+}
+function setSendStat(ico, h, p) {
+  document.getElementById('sico').textContent = ico;
+  document.getElementById('sh').textContent   = h;
+  document.getElementById('sp').textContent   = p;
+}
+function resetSend() {
+  cleanup(); sFiles = []; renderFiles();
+  document.getElementById('scode').textContent = '······';
+  document.getElementById('shint').textContent = 'Generating your code…';
+  setStatus('na', '<span class="spin"></span> Connecting…');
+  sStep(1);
+}
+
+// ════════════════════════════════════════════════════
+// RECEIVE DATA
+// ════════════════════════════════════════════════════
+function onData(e) {
+  if (typeof e.data === 'string') {
+    const m = JSON.parse(e.data);
+    if (m.type === 'count') {
+      rN = m.count; rFiles = []; rDls = []; rTot = 0; rGot = 0;
+      document.getElementById('rpw').style.display = 'block';
+    }
+    if (m.type === 'meta') {
+      rCurIdx = m.index;
+      rCur = { name: m.name, size: m.size, chunks: [], got: 0 };
+      rFiles[m.index] = rCur; rTot += m.size;
+      addRUI(m.index, m.name, m.size);
+      document.getElementById('rsub').textContent = 'Receiving ' + m.name + '…';
+    }
+    if (m.type === 'done') {
+      const fi = rFiles[m.index];
+      if (fi) {
+        const url = URL.createObjectURL(new Blob(fi.chunks));
+        rDls[m.index] = { url, name: fi.name };
+        enableDL(m.index, url, fi.name); setRBar(m.index, 100);
+        if (rDls.filter(Boolean).length === rN) {
+          document.getElementById('rtit').textContent = '✅ Done!';
+          document.getElementById('rsub').textContent = 'All files received. Tap Save below.';
+        }
+      }
+    }
+  } else {
+    if (rCur) {
+      rCur.chunks.push(e.data); rCur.got += e.data.byteLength; rGot += e.data.byteLength;
+      const tot = rTot > 0 ? rGot / rTot * 100 : 0;
+      document.getElementById('rpf').style.width     = tot + '%';
+      document.getElementById('rpct').textContent    = tot.toFixed(1) + '%';
+      const s = (Date.now() - rStart) / 1000;
+      document.getElementById('rspd').textContent    = fmt(s > 0 ? rGot / s : 0) + '/s';
+      setRBar(rCurIdx, rCur.size > 0 ? rCur.got / rCur.size * 100 : 0);
+    }
+  }
+}
+function addRUI(idx, name, size) {
+  const el = document.getElementById('rfl');
+  const d  = document.createElement('div'); d.className = 'rf';
+  d.innerHTML = `<div style="font-size:22px;flex-shrink:0">📄</div>
+    <div class="rfi">
+      <div class="rfn">${esc(name)}</div>
+      <div class="rfs">${fmt(size)}</div>
+      <div class="rfp"><div class="fpt"><div class="fpf" id="rb${idx}" style="width:0%"></div></div></div>
+    </div>
+    <button class="dlb" id="dl${idx}" disabled>↓ Save</button>`;
+  el.appendChild(d);
+}
+function setRBar(i, p) { const b = document.getElementById('rb'+i); if(b) b.style.width = p+'%'; }
+function enableDL(i, url, name) {
+  const b = document.getElementById('dl'+i);
+  if (b) { b.disabled = false; b.onclick = () => { const a = document.createElement('a'); a.href = url; a.download = name; a.click(); }; }
+}
+
+// ════════════════════════════════════════════════════
+// UTILS
+// ════════════════════════════════════════════════════
+function randCode() {
+  let c = '';
+  for (let i = 0; i < 6; i++) c += CHARS[Math.floor(Math.random() * CHARS.length)];
+  return c;
+}
+function setStatus(cls, html) {
+  const el = document.getElementById('s-status');
+  if (!el) return;
+  el.className = 'nt n' + cls;
+  el.innerHTML = '<span class="ni">' + html + '</span>';
+}
+function showRErr(msg) {
+  rStep(2);
+  document.getElementById('rh').textContent = 'Failed';
+  document.getElementById('rp').textContent = '';
+  const el = document.getElementById('rerr');
+  el.style.display = 'block';
+  el.innerHTML = `
+    <div class="nt nr"><span class="ni">❌</span><span>${msg}</span></div>
+    <button class="btn bd2" style="margin-top:8px" onclick="
+      cleanup();
+      rStep(1);
+      document.getElementById('rerr').style.display='none';
+      document.getElementById('rh').textContent='Connecting';
+      document.getElementById('rp').textContent='Reaching the sender…';
+    ">← Try again</button>`;
+}
+function toast(msg) {
+  document.querySelectorAll('.vmsg').forEach(t => t.remove());
+  const t = document.createElement('div'); t.className = 'vmsg';
+  t.style.cssText = 'position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(10px);background:#0f0f0f;color:#fff;padding:10px 18px;border-radius:100px;font-size:13px;font-weight:600;z-index:9999;opacity:0;transition:all .25s cubic-bezier(.34,1.56,.64,1);max-width:88vw;text-align:center;box-shadow:0 6px 24px rgba(0,0,0,.2);pointer-events:none;';
+  t.textContent = msg; document.body.appendChild(t);
+  requestAnimationFrame(() => { t.style.opacity = '1'; t.style.transform = 'translateX(-50%) translateY(0)'; });
+  setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateX(-50%) translateY(8px)'; setTimeout(() => t.remove(), 300); }, 3200);
+}
+</script>
+</body>
+</html>
