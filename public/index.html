@@ -281,15 +281,23 @@ const WS_URL = (() => {
   return `${proto}//${location.host}`;
 })();
 
-const ICE_SERVERS = [
+// Loaded at runtime from /ice — server picks best TURN credentials
+let ICE_SERVERS = [
   { urls: 'stun:stun.l.google.com:19302' },
-  { urls: 'stun:stun1.l.google.com:19302' },
-  { urls: 'stun:stun2.l.google.com:19302' },
-  { urls: 'stun:stun.cloudflare.com:3478' },
-  { urls: 'turn:openrelay.metered.ca:80',                username:'openrelayproject', credential:'openrelayproject' },
-  { urls: 'turn:openrelay.metered.ca:443',               username:'openrelayproject', credential:'openrelayproject' },
-  { urls: 'turn:openrelay.metered.ca:443?transport=tcp', username:'openrelayproject', credential:'openrelayproject' },
+  { urls: 'stun:freestun.net:3478' },
+  { urls: 'turn:freestun.net:3478', username: 'free', credential: 'free' },
 ];
+async function loadIceServers() {
+  try {
+    const r = await fetch('/ice');
+    if (r.ok) {
+      ICE_SERVERS = await r.json();
+      log('ICE servers: ' + ICE_SERVERS.filter(s=>s.urls.startsWith('turn')).map(s=>s.urls).join(', '), 'ok');
+    }
+  } catch(e) {
+    log('ICE server fetch failed, using defaults', 'err');
+  }
+}
 
 const CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 const CHUNK = 65536;
@@ -430,12 +438,13 @@ function wsSend(msg) {
 }
 
 // ─── SENDER ──────────────────────────────────────────
-function initSend() {
+async function initSend() {
   role='sender';
   myCode=randCode();
   sStep(2);
   setStatus('s-status','s-st-txt','na','<span class="spin"></span> Connecting to server…');
   log('Sender starting, code will be: ' + myCode);
+  await loadIceServers();
 
   openWS(() => {
     wsSend({ type:'register', room:myCode });
@@ -543,13 +552,14 @@ function copyCode() {
 }
 
 // ─── RECEIVER ────────────────────────────────────────
-function doConnect() {
+async function doConnect() {
   const code = document.getElementById('rinput').value.trim().toUpperCase();
   if (code.length < 4) { toast('Enter the full code'); return; }
   role='receiver'; myCode=code;
   rStep(2);
   setRStatus('na','<span class="spin"></span> Connecting to server…');
   log('Receiver starting, looking for code: ' + code);
+  await loadIceServers();
 
   openWS(() => {
     wsSend({ type:'join', room:code });

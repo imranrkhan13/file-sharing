@@ -2,33 +2,70 @@ const express = require('express');
 const { WebSocketServer } = require('ws');
 const http = require('http');
 const path = require('path');
+const crypto = require('crypto');
+
+// ── TURN credential generation ────────────────────────
+// If TURN_SECRET + TURN_HOST env vars are set on Render,
+// server mints short-lived HMAC credentials.
+// Otherwise falls back to multiple public servers.
+function getIceServers() {
+  const secret = process.env.TURN_SECRET;
+  const host   = process.env.TURN_HOST;
+
+  if (secret && host) {
+    const ttl      = 24 * 3600;
+    const username = `${Math.floor(Date.now() / 1000) + ttl}:vault`;
+    const hmac     = crypto.createHmac('sha1', secret);
+    hmac.update(username);
+    const credential = hmac.digest('base64');
+    console.log('Using self-hosted TURN:', host);
+    return [
+      { urls: `stun:${host}:3478` },
+      { urls: `turn:${host}:3478`, username, credential },
+      { urls: `turn:${host}:3478?transport=tcp`, username, credential },
+      { urls: `turns:${host}:5349`, username, credential },
+    ];
+  }
+
+  // freestun.net has real static free credentials that work
+  return [
+    { urls: 'stun:stun.l.google.com:19302' },
+    { urls: 'stun:stun1.l.google.com:19302' },
+    { urls: 'stun:stun.cloudflare.com:3478' },
+    { urls: 'stun:freestun.net:3478' },
+    { urls: 'turn:freestun.net:3478',      username: 'free', credential: 'free' },
+    { urls: 'turn:freestun.net:5349',      username: 'free', credential: 'free' },
+    { urls: 'turn:openrelay.metered.ca:80',                username: 'openrelayproject', credential: 'openrelayproject' },
+    { urls: 'turn:openrelay.metered.ca:443',               username: 'openrelayproject', credential: 'openrelayproject' },
+    { urls: 'turn:openrelay.metered.ca:443?transport=tcp', username: 'openrelayproject', credential: 'openrelayproject' },
+  ];
+}
 
 const app = express();
 const server = http.createServer(app);
 
-// Render requires explicit WebSocket upgrade handling
+// Render needs explicit upgrade handling for WebSockets
 const wss = new WebSocketServer({ noServer: true });
-
-server.on('upgrade', (request, socket, head) => {
-  wss.handleUpgrade(request, socket, head, (ws) => {
-    wss.emit('connection', ws, request);
-  });
+server.on('upgrade', (req, socket, head) => {
+  wss.handleUpgrade(req, socket, head, (ws) => wss.emit('connection', ws, req));
 });
 
-// Serve static frontend
+// Serve frontend
 app.use(express.static(path.join(__dirname, 'public')));
 
-// rooms[code] = { sender: ws, receiver: ws }
+// Send ICE servers to client on request
+app.get('/ice', (req, res) => {
+  res.json(getIceServers());
+});
+
+// rooms[code] = { sender: ws, receiver: ws, createdAt }
 const rooms = {};
 
-// Clean up old empty rooms every 10 minutes
+// Expire rooms older than 1 hour
 setInterval(() => {
-  const now = Date.now();
+  const cutoff = Date.now() - 60 * 60 * 1000;
   for (const code in rooms) {
-    const room = rooms[code];
-    if (room.createdAt && (now - room.createdAt) > 60 * 60 * 1000) {
-      delete rooms[code]; // expire after 1 hour
-    }
+    if (rooms[code].createdAt < cutoff) delete rooms[code];
   }
 }, 10 * 60 * 1000);
 
@@ -39,81 +76,65 @@ wss.on('connection', (ws) => {
   ws.on('message', (raw) => {
     let msg;
     try { msg = JSON.parse(raw); } catch { return; }
-
     const { type, room, ...rest } = msg;
 
-    // ── SENDER registers a room ──────────────────────────
+    // SENDER registers a room
     if (type === 'register') {
       if (!room || room.length < 4) return;
       const code = room.toUpperCase();
-
-      if (rooms[code] && rooms[code].sender && rooms[code].sender.readyState === 1) {
+      if (rooms[code]?.sender?.readyState === 1) {
         ws.send(JSON.stringify({ type: 'error', message: 'code-taken' }));
         return;
       }
-
       rooms[code] = rooms[code] || { createdAt: Date.now() };
       rooms[code].sender = ws;
       currentRoom = code;
       currentRole = 'sender';
-
       ws.send(JSON.stringify({ type: 'registered', code }));
+      console.log(`Room registered: ${code}`);
     }
 
-    // ── RECEIVER joins a room ────────────────────────────
+    // RECEIVER joins a room
     if (type === 'join') {
       if (!room) return;
       const code = room.toUpperCase();
       const r = rooms[code];
-
-      if (!r || !r.sender || r.sender.readyState !== 1) {
+      if (!r?.sender || r.sender.readyState !== 1) {
         ws.send(JSON.stringify({ type: 'room-not-found' }));
         return;
       }
-
       r.receiver = ws;
       currentRoom = code;
       currentRole = 'receiver';
-
-      // Tell sender that receiver joined
       r.sender.send(JSON.stringify({ type: 'receiver-joined' }));
       ws.send(JSON.stringify({ type: 'joined', code }));
+      console.log(`Receiver joined room: ${code}`);
     }
 
-    // ── RELAY: offer / answer / ice candidate ────────────
+    // Relay signaling messages
     if (type === 'offer' || type === 'answer' || type === 'ice') {
       const r = rooms[currentRoom];
       if (!r) return;
-
-      if (currentRole === 'sender' && r.receiver?.readyState === 1) {
+      if (currentRole === 'sender' && r.receiver?.readyState === 1)
         r.receiver.send(JSON.stringify({ type, from: 'sender', ...rest }));
-      }
-      if (currentRole === 'receiver' && r.sender?.readyState === 1) {
+      if (currentRole === 'receiver' && r.sender?.readyState === 1)
         r.sender.send(JSON.stringify({ type, from: 'receiver', ...rest }));
-      }
     }
   });
 
   ws.on('close', () => {
     if (!currentRoom || !rooms[currentRoom]) return;
     const r = rooms[currentRoom];
-
-    // Notify the other side
-    if (currentRole === 'sender' && r.receiver?.readyState === 1) {
+    if (currentRole === 'sender' && r.receiver?.readyState === 1)
       r.receiver.send(JSON.stringify({ type: 'peer-left' }));
-    }
-    if (currentRole === 'receiver' && r.sender?.readyState === 1) {
+    if (currentRole === 'receiver' && r.sender?.readyState === 1)
       r.sender.send(JSON.stringify({ type: 'peer-left' }));
-    }
-
-    // Clean up
     if (currentRole === 'sender') delete r.sender;
     if (currentRole === 'receiver') delete r.receiver;
     if (!r.sender && !r.receiver) delete rooms[currentRoom];
+    console.log(`${currentRole} left room: ${currentRoom}`);
   });
 });
 
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => {
-  console.log(`Vault running on http://localhost:${PORT}`);
-});
+server.listen(PORT, () => console.log(`Vault running on port ${PORT}`));
