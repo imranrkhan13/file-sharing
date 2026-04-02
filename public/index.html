@@ -1,0 +1,1896 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta property="og:title" content="Vault - Send Files">
+  <meta property="og:description" content="Send files instantly using link or code. No cloud, no limits.">
+  <meta property="og:image" content="https://file-sharing-vu8t.onrender.com/og-image.png">
+  <meta property="og:url" content="https://file-sharing-vu8t.onrender.com">
+  <meta property="og:type" content="website">
+  <!-- Default favicon -->
+  <link rel="icon" href="/dot.png" type="image/png">
+  
+  <!-- Recommended fallback -->
+  <link rel="shortcut icon" href="/dot.png">
+  
+  <!-- For modern browsers -->
+  <link rel="apple-touch-icon" href="/dot.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Vault - Send Files">
+  <meta name="twitter:description" content="Send files instantly using link or code.">
+  <meta name="twitter:image" content="https://file-sharing-vu8t.onrender.com/og-image.png">
+  <title>Vault · Send Files</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500&display=swap"
+    rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg: #f2f2f0;
+      --w: #fff;
+      --ink: #0f0f0f;
+      --i2: #555;
+      --i3: #999;
+      --bd: #e4e4e0;
+      --ac: #f97316;
+      --bl: #2563eb;
+      --bls: #eff4ff;
+      --gn: #16a34a;
+      --gns: #f0fdf4;
+      --rd: #dc2626;
+      --sh: 0 2px 8px rgba(0, 0, 0, .06), 0 0 0 1px rgba(0, 0, 0, .04);
+      --shh: 0 8px 32px rgba(0, 0, 0, .10), 0 0 0 1px rgba(0, 0, 0, .05);
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      height: 58px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      background: rgba(242, 242, 240, .94);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--bd);
+    }
+
+    .logo {
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: -.3px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+
+    .ldot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--ac);
+    }
+
+    .npill {
+      background: var(--ink);
+      color: #fff;
+      padding: 7px 15px;
+      border-radius: 100px;
+      font-size: 13px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+    }
+
+    .page {
+      display: none;
+      padding-top: 58px;
+      min-height: 100vh;
+    }
+
+    .page.on {
+      display: block;
+    }
+
+    .home {
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 52px 20px 72px;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--w);
+      border: 1px solid var(--bd);
+      border-radius: 100px;
+      padding: 5px 12px 5px 8px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--i2);
+      margin-bottom: 22px;
+      box-shadow: var(--sh);
+    }
+
+    .tdot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--gn);
+      animation: glow 2s infinite;
+    }
+
+    @keyframes glow {
+
+      0%,
+      100% {
+        box-shadow: 0 0 0 3px rgba(22, 163, 74, .15)
+      }
+
+      50% {
+        box-shadow: 0 0 0 6px rgba(22, 163, 74, .06)
+      }
+    }
+
+    h1 {
+      font-size: clamp(38px, 8vw, 72px);
+      font-weight: 900;
+      line-height: 1.02;
+      letter-spacing: -2px;
+      margin-bottom: 14px;
+    }
+
+    h1 em {
+      font-style: normal;
+      color: var(--ac);
+    }
+
+    .sub {
+      font-size: clamp(14px, 2.5vw, 17px);
+      color: var(--i2);
+      line-height: 1.65;
+      max-width: 460px;
+      margin-bottom: 36px;
+    }
+
+    .cg {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      max-width: 540px;
+      margin-bottom: 56px;
+    }
+
+    .cc {
+      background: var(--w);
+      border-radius: 20px;
+      padding: 26px 22px;
+      cursor: pointer;
+      transition: all .22s;
+      box-shadow: var(--sh);
+      border: 1.5px solid transparent;
+    }
+
+    .cc:hover {
+      box-shadow: var(--shh);
+      transform: translateY(-3px);
+      border-color: var(--ac);
+    }
+
+    .cci {
+      width: 46px;
+      height: 46px;
+      border-radius: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      margin-bottom: 14px;
+    }
+
+    .si {
+      background: #fff3eb;
+    }
+
+    .ri {
+      background: var(--bls);
+    }
+
+    .cct {
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: -.3px;
+      margin-bottom: 4px;
+    }
+
+    .ccd {
+      font-size: 13px;
+      color: var(--i2);
+      line-height: 1.5;
+    }
+
+    .arr {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: var(--ink);
+      color: #fff;
+      font-size: 12px;
+      margin-top: 12px;
+      transition: transform .2s;
+    }
+
+    .cc:hover .arr {
+      transform: translateX(3px);
+    }
+
+    .how {
+      background: var(--ink);
+      border-radius: 22px;
+      padding: 44px 36px;
+    }
+
+    .hlbl {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, .3);
+      margin-bottom: 8px;
+    }
+
+    .ht {
+      font-size: clamp(22px, 4vw, 30px);
+      font-weight: 900;
+      letter-spacing: -1px;
+      color: #fff;
+      margin-bottom: 32px;
+    }
+
+    .sg {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .sc {
+      background: rgba(255, 255, 255, .05);
+      border-radius: 16px;
+      padding: 20px;
+    }
+
+    .sn {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--ac);
+      margin-bottom: 10px;
+    }
+
+    .stt {
+      font-size: 14px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 5px;
+    }
+
+    .sd {
+      font-size: 12px;
+      color: rgba(255, 255, 255, .45);
+      line-height: 1.6;
+    }
+
+    .xw {
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 30px 18px 72px;
+    }
+
+    .xh {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      margin-bottom: 26px;
+    }
+
+    .bk {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--w);
+      border: 1.5px solid var(--bd);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 14px;
+      color: var(--i2);
+      transition: all .2s;
+      box-shadow: var(--sh);
+      flex-shrink: 0;
+    }
+
+    .bk:hover {
+      border-color: var(--ink);
+    }
+
+    .xtit {
+      font-size: 24px;
+      font-weight: 900;
+      letter-spacing: -.5px;
+    }
+
+    .xs {
+      display: none;
+    }
+
+    .xs.on {
+      display: block;
+      animation: up .28s ease;
+    }
+
+    @keyframes up {
+      from {
+        opacity: 0;
+        transform: translateY(8px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
+
+    .card {
+      background: var(--w);
+      border-radius: 20px;
+      padding: 22px;
+      margin-bottom: 11px;
+      box-shadow: var(--sh);
+    }
+
+    .ct {
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: -.3px;
+      margin-bottom: 3px;
+    }
+
+    .csu {
+      font-size: 13px;
+      color: var(--i2);
+      margin-bottom: 18px;
+      line-height: 1.5;
+    }
+
+    .dz {
+      border: 2px dashed var(--bd);
+      border-radius: 14px;
+      padding: 36px 14px;
+      text-align: center;
+      cursor: pointer;
+      transition: all .22s;
+      background: var(--bg);
+    }
+
+    .dz:hover,
+    .dz.ov {
+      border-color: var(--ac);
+      background: #fff8f3;
+    }
+
+    .dze {
+      font-size: 32px;
+      margin-bottom: 9px;
+      display: block;
+    }
+
+    .dzt {
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 3px;
+    }
+
+    .dzs {
+      font-size: 12px;
+      color: var(--i3);
+    }
+
+    .fl {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 11px;
+    }
+
+    .fr {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg);
+      border: 1px solid var(--bd);
+      border-radius: 11px;
+      padding: 10px 11px;
+      animation: up .2s;
+    }
+
+    .fe {
+      width: 32px;
+      height: 32px;
+      border-radius: 7px;
+      background: var(--ink);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px;
+      font-weight: 500;
+      flex-shrink: 0;
+      text-transform: uppercase;
+    }
+
+    .fn {
+      font-weight: 600;
+      font-size: 12px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .fsz {
+      font-size: 11px;
+      color: var(--i3);
+    }
+
+    .fdel {
+      margin-left: auto;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 1px solid var(--bd);
+      background: none;
+      cursor: pointer;
+      color: var(--i3);
+      font-size: 11px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .fdel:hover {
+      background: #fff0f0;
+      border-color: var(--rd);
+      color: var(--rd);
+    }
+
+    /* ── MODE CHOOSER ───── */
+    .mode-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 4px;
+    }
+
+    .mode-card {
+      border: 2px solid var(--bd);
+      border-radius: 16px;
+      padding: 18px 16px;
+      cursor: pointer;
+      transition: all .2s;
+      background: var(--bg);
+      text-align: left;
+    }
+
+    .mode-card:hover {
+      border-color: var(--ink);
+      background: var(--w);
+    }
+
+    .mode-card.sel {
+      border-color: var(--ac);
+      background: #fff8f3;
+    }
+
+    .mode-icon {
+      font-size: 24px;
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    .mode-title {
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: -.2px;
+      margin-bottom: 3px;
+    }
+
+    .mode-desc {
+      font-size: 12px;
+      color: var(--i2);
+      line-height: 1.5;
+    }
+
+    .mode-badge {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 100px;
+      margin-top: 6px;
+    }
+
+    .mb-ac {
+      background: #fff3eb;
+      color: #c2410c;
+    }
+
+    .mb-bl {
+      background: var(--bls);
+      color: #1d4ed8;
+    }
+
+    /* ── LINK UPLOAD PROGRESS ── */
+    .uprog {
+      margin: 14px 0;
+    }
+
+    .uprog-bar {
+      height: 5px;
+      background: var(--bd);
+      border-radius: 100px;
+      overflow: hidden;
+      margin-bottom: 5px;
+    }
+
+    .uprog-fill {
+      height: 100%;
+      border-radius: 100px;
+      background: var(--bl);
+      transition: width .3s;
+    }
+
+    .uprog-label {
+      font-size: 12px;
+      color: var(--i3);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* ── LINK RESULT ── */
+    .link-result {
+      background: var(--bls);
+      border: 1.5px solid #bfdbfe;
+      border-radius: 16px;
+      padding: 18px;
+      margin: 14px 0;
+    }
+
+    .link-lbl {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--bl);
+      margin-bottom: 8px;
+    }
+
+    .link-url {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: var(--bl);
+      word-break: break-all;
+      line-height: 1.5;
+      margin-bottom: 10px;
+      font-weight: 500;
+    }
+
+    .link-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .la-btn {
+      padding: 8px 14px;
+      border-radius: 100px;
+      font-size: 12px;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      transition: all .2s;
+    }
+
+    .la-copy {
+      background: var(--bl);
+      color: #fff;
+    }
+
+    .la-copy:hover {
+      background: #1d4ed8;
+    }
+
+    .la-wa {
+      background: #25d366;
+      color: #fff;
+    }
+
+    .la-wa:hover {
+      background: #1fbb59;
+    }
+
+    .code-block {
+      background: var(--bg);
+      border: 2px solid var(--bd);
+      border-radius: 16px;
+      padding: 20px 14px 14px;
+      text-align: center;
+      margin: 14px 0;
+      cursor: pointer;
+      transition: all .22s;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    .code-block:hover {
+      border-color: var(--bl);
+      background: var(--bls);
+    }
+
+    .code-block:active {
+      transform: scale(.98);
+    }
+
+    .clbl {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--i3);
+      margin-bottom: 10px;
+    }
+
+    .cval {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: clamp(42px, 12vw, 60px);
+      font-weight: 500;
+      letter-spacing: 12px;
+      color: var(--bl);
+      display: block;
+      line-height: 1;
+    }
+
+    .chint {
+      font-size: 12px;
+      color: var(--i3);
+      margin-top: 10px;
+    }
+
+    .ci {
+      display: block;
+      width: 100%;
+      padding: 16px 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: clamp(34px, 10vw, 50px);
+      font-weight: 500;
+      letter-spacing: 10px;
+      text-align: center;
+      text-transform: uppercase;
+      border: 2px solid var(--bd);
+      border-radius: 14px;
+      background: var(--w);
+      color: var(--ink);
+      outline: none;
+      transition: border-color .2s;
+      margin: 12px 0;
+      caret-color: var(--bl);
+    }
+
+    .ci:focus {
+      border-color: var(--bl);
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, .08);
+    }
+
+    .ci::placeholder {
+      color: var(--bd);
+      letter-spacing: 6px;
+      font-size: clamp(24px, 7vw, 38px);
+    }
+
+    .nt {
+      display: flex;
+      align-items: flex-start;
+      gap: 9px;
+      padding: 11px 13px;
+      border-radius: 12px;
+      font-size: 13px;
+      line-height: 1.6;
+      margin-bottom: 10px;
+    }
+
+    .ni {
+      font-size: 15px;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .nb {
+      background: var(--bls);
+      border: 1px solid #bfdbfe;
+      color: #1e40af;
+    }
+
+    .na {
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      color: #92400e;
+    }
+
+    .ng {
+      background: var(--gns);
+      border: 1px solid #bbf7d0;
+      color: #166534;
+    }
+
+    .nr {
+      background: #fff5f5;
+      border: 1px solid #fecaca;
+      color: #991b1b;
+    }
+
+    .strow {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      background: var(--bg);
+      border: 1px solid var(--bd);
+      border-radius: 13px;
+      padding: 13px 15px;
+      margin: 10px 0;
+    }
+
+    .stico {
+      font-size: 22px;
+    }
+
+    .stt2 {
+      font-weight: 700;
+      font-size: 13px;
+      margin-bottom: 1px;
+    }
+
+    .stp {
+      font-size: 12px;
+      color: var(--i2);
+    }
+
+    .spin {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      border: 2px solid rgba(37, 99, 235, .2);
+      border-top-color: var(--bl);
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+      vertical-align: middle;
+      margin-right: 4px;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg)
+      }
+    }
+
+    .btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 13px 22px;
+      border-radius: 13px;
+      border: none;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      font-weight: 700;
+      font-size: 14px;
+      transition: all .2s;
+      width: 100%;
+    }
+
+    .bd2 {
+      background: var(--ink);
+      color: #fff;
+    }
+
+    .bd2:hover {
+      background: #222;
+      transform: translateY(-1px);
+    }
+
+    .btn:disabled {
+      opacity: .35;
+      pointer-events: none;
+    }
+
+    .mt {
+      margin-top: 10px;
+    }
+
+    .pw {
+      margin: 13px 0;
+    }
+
+    .ptrack {
+      height: 5px;
+      background: var(--bd);
+      border-radius: 100px;
+      overflow: hidden;
+      margin-bottom: 6px;
+    }
+
+    .pfill {
+      height: 100%;
+      border-radius: 100px;
+      background: var(--bl);
+      transition: width .3s ease;
+    }
+
+    .pmeta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .ppct {
+      color: var(--bl);
+      font-weight: 500;
+    }
+
+    .pspd {
+      color: var(--i3);
+    }
+
+    .fpl {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 9px;
+    }
+
+    .fpi {
+      background: var(--bg);
+      border: 1px solid var(--bd);
+      border-radius: 11px;
+      padding: 11px 13px;
+    }
+
+    .fpr {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .fpn {
+      font-weight: 600;
+      font-size: 12px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 75%;
+    }
+
+    .fpp {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--i3);
+    }
+
+    .fpt {
+      height: 3px;
+      background: var(--bd);
+      border-radius: 100px;
+      overflow: hidden;
+    }
+
+    .fpf {
+      height: 100%;
+      border-radius: 100px;
+      background: var(--bl);
+      transition: width .3s;
+    }
+
+    .rf {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--bg);
+      border: 1px solid var(--bd);
+      border-radius: 11px;
+      padding: 11px 12px;
+      margin-bottom: 7px;
+      animation: up .3s;
+    }
+
+    .rfi {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .rfn {
+      font-weight: 600;
+      font-size: 13px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .rfs {
+      font-size: 11px;
+      color: var(--i3);
+    }
+
+    .rfp {
+      margin-top: 5px;
+    }
+
+    .dlb {
+      padding: 7px 13px;
+      background: var(--gn);
+      color: #fff;
+      border: none;
+      border-radius: 100px;
+      font-weight: 700;
+      font-size: 12px;
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .dlb:hover {
+      background: #15803d;
+    }
+
+    .dlb:disabled {
+      opacity: .3;
+      pointer-events: none;
+      background: var(--i3);
+    }
+
+    .dw {
+      text-align: center;
+      padding: 40px 14px;
+    }
+
+    .dc {
+      width: 68px;
+      height: 68px;
+      border-radius: 50%;
+      background: var(--gns);
+      border: 2px solid #bbf7d0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 30px;
+      margin: 0 auto 14px;
+      animation: pop .5s cubic-bezier(.34, 1.56, .64, 1);
+    }
+
+    @keyframes pop {
+      from {
+        transform: scale(0);
+        opacity: 0
+      }
+
+      to {
+        transform: scale(1);
+        opacity: 1
+      }
+    }
+
+    .dt {
+      font-size: 26px;
+      font-weight: 900;
+      letter-spacing: -.5px;
+      margin-bottom: 7px;
+    }
+
+    .dp {
+      font-size: 14px;
+      color: var(--i2);
+      margin-bottom: 22px;
+      line-height: 1.6;
+    }
+
+    .dbg {
+      background: #0f0f0f;
+      color: #a3e635;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin-top: 10px;
+      max-height: 180px;
+      overflow-y: auto;
+      line-height: 1.7;
+      display: none;
+    }
+
+    .dbg.show {
+      display: block;
+    }
+
+    .dbg-line {
+      margin: 0;
+    }
+
+    .dbg-line.err {
+      color: #f87171;
+    }
+
+    .dbg-line.ok {
+      color: #86efac;
+    }
+
+    .dbg-line.info {
+      color: #93c5fd;
+    }
+
+    .dbg-toggle {
+      font-size: 11px;
+      color: var(--i3);
+      cursor: pointer;
+      text-decoration: underline;
+      margin-top: 6px;
+      display: inline-block;
+    }
+
+    @media(max-width:540px) {
+      .cg {
+        grid-template-columns: 1fr;
+      }
+
+      .sg {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+
+      .how {
+        padding: 30px 20px;
+        border-radius: 18px;
+      }
+
+      .home {
+        padding: 40px 16px 60px;
+      }
+
+      .xw {
+        padding: 22px 14px 64px;
+      }
+
+      .card {
+        padding: 18px 15px;
+      }
+
+      .mode-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <nav>
+    <div class="logo" onclick="goHome()"><span class="ldot"></span>Vault</div>
+    <button class="npill" onclick="showPage('send')">Send a file →</button>
+  </nav>
+
+  <!-- HOME -->
+  <div class="page on" id="pg-home">
+    <div class="home">
+      <div class="tag"><span class="tdot"></span> Works worldwide · No account · No storage</div>
+      <h1>Send files to<br><em>any device.</em><br>Anywhere.</h1>
+      <p class="sub">Share a 6-letter code or generate a download link. Files fly over directly — encrypted, no cloud,
+        no size limit.</p>
+      <div class="cg">
+        <div class="cc" onclick="showPage('send')">
+          <div class="cci si">📤</div>
+          <div class="cct">Send files</div>
+          <div class="ccd">Pick files, choose code or link. Share it.</div>
+          <div class="arr">→</div>
+        </div>
+        <div class="cc" onclick="showPage('recv')">
+          <div class="cci ri">📥</div>
+          <div class="cct">Receive files</div>
+          <div class="ccd">Type the 6-letter code. Files arrive.</div>
+          <div class="arr">→</div>
+        </div>
+      </div>
+      <div class="how">
+        <div class="hlbl">How it works</div>
+        <div class="ht">Two ways to share.</div>
+        <div class="sg">
+          <div class="sc">
+            <div class="sn">📎 Link</div>
+            <div class="stt">Generate a link</div>
+            <div class="sd">Upload files → get a URL → share anywhere. Works even when recipient is offline.</div>
+          </div>
+          <div class="sc">
+            <div class="sn">🔑 Code</div>
+            <div class="stt">Use a 6-letter code</div>
+            <div class="sd">Peer-to-peer transfer. Both devices online at the same time.</div>
+          </div>
+          <div class="sc">
+            <div class="sn">🔒 Private</div>
+            <div class="stt">No account needed</div>
+            <div class="sd">Links expire in 24h. Code transfers are direct and encrypted.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SEND -->
+  <div class="page" id="pg-send">
+    <div class="xw">
+      <div class="xh"><button class="bk" onclick="goHome()">←</button>
+        <div class="xtit">Send files</div>
+      </div>
+
+      <!-- Step 1: Pick files -->
+      <div class="xs on" id="ss1">
+        <div class="card">
+          <div class="ct">Pick your files</div>
+          <div class="csu">Any type, any size.</div>
+          <div class="dz" id="dz" onclick="document.getElementById('fi').click()" ondragover="dzO(event)"
+            ondragleave="dzL()" ondrop="dzD(event)">
+            <span class="dze">📁</span>
+            <div class="dzt">Drop files here or tap to browse</div>
+            <div class="dzs">Photos, videos, docs, ZIP — anything works</div>
+          </div>
+          <input type="file" id="fi" multiple style="display:none" onchange="addFiles(this.files)">
+          <div class="fl" id="flist"></div>
+        </div>
+        <button class="btn bd2 mt" id="btn-go" disabled onclick="sStep(15)">Choose how to share →</button>
+      </div>
+
+      <!-- Step 1.5: Mode chooser -->
+      <div class="xs" id="ss15">
+        <div class="card">
+          <div class="ct">How do you want to share?</div>
+          <div class="csu">Choose the method that works best for you.</div>
+          <div class="mode-grid">
+            <div class="mode-card" id="mc-link" onclick="selectMode('link')">
+              <span class="mode-icon">🔗</span>
+              <div class="mode-title">Generate a link</div>
+              <div class="mode-desc">Upload to server, get a shareable URL. Recipient doesn't need to be online.</div>
+              <span class="mode-badge mb-bl">Works anytime</span>
+            </div>
+            <div class="mode-card" id="mc-code" onclick="selectMode('code')">
+              <span class="mode-icon">📡</span>
+              <div class="mode-title">Use a code</div>
+              <div class="mode-desc">Peer-to-peer direct transfer. Both devices online at the same time.</div>
+              <span class="mode-badge mb-ac">No server storage</span>
+            </div>
+          </div>
+        </div>
+        <button class="btn bd2 mt" id="btn-mode" disabled onclick="startChosenMode()">Continue →</button>
+      </div>
+
+      <!-- Step 2a: Link upload -->
+      <div class="xs" id="ss2a">
+        <div class="card">
+          <div class="ct">Uploading…</div>
+          <div class="csu">Files are being uploaded to generate your link.</div>
+          <div class="uprog">
+            <div class="uprog-bar">
+              <div class="uprog-fill" id="uprog-fill" style="width:0%"></div>
+            </div>
+            <div class="uprog-label" id="uprog-label">Preparing…</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2b: Link ready -->
+      <div class="xs" id="ss2b">
+        <div class="card">
+          <div class="ct">Your link is ready! 🎉</div>
+          <div class="csu">Share it with anyone — they don't need Vault installed.</div>
+          <div class="link-result">
+            <div class="link-lbl">Download link · expires in 24h</div>
+            <div class="link-url" id="gen-link-url">—</div>
+            <div class="link-actions">
+              <button class="la-btn la-copy" onclick="copyLink()">📋 Copy link</button>
+              <button class="la-btn la-wa" onclick="shareWhatsApp()">💬 WhatsApp</button>
+            </div>
+          </div>
+          <div class="nt ng"><span class="ni">✓</span><span>Anyone with this link can download the files for the next 24
+              hours.</span></div>
+        </div>
+        <button class="btn bd2" onclick="resetSend()">Send more files</button>
+      </div>
+
+      <!-- Step 2: Code waiting (peer-to-peer) -->
+      <div class="xs" id="ss2">
+        <div class="card">
+          <div class="ct">Your code</div>
+          <div class="csu">Share this with the receiver.</div>
+          <div id="s-status" class="nt na"><span class="ni"><span class="spin"></span></span><span id="s-st-txt">
+              Connecting to server…</span></div>
+          <div class="code-block" onclick="copyCode()">
+            <div class="clbl">Tap to copy</div>
+            <span class="cval" id="scode">······</span>
+            <div class="chint" id="shint">Generating…</div>
+          </div>
+          <div class="nt nb"><span class="ni">💬</span><span>Receiver: open Vault → <strong>Receive files</strong> →
+              type this code.</span></div>
+          <span class="dbg-toggle" onclick="toggleDbg('sdbg')">show debug log</span>
+          <div class="dbg" id="sdbg"></div>
+        </div>
+        <div class="card">
+          <div class="strow">
+            <div class="stico">⏳</div>
+            <div>
+              <div class="stt2">Waiting for receiver…</div>
+              <div class="stp">Files send automatically once they connect</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3: Sending (peer-to-peer) -->
+      <div class="xs" id="ss3">
+        <div class="card">
+          <div class="ct">Sending…</div>
+          <div class="csu">Streaming to their device.</div>
+          <div class="strow">
+            <div class="stico" id="sico">⚡</div>
+            <div>
+              <div class="stt2" id="sh">Sending</div>
+              <div class="stp" id="sp">Encrypted transfer</div>
+            </div>
+          </div>
+          <div class="pw">
+            <div class="ptrack">
+              <div class="pfill" id="spf" style="width:0%"></div>
+            </div>
+            <div class="pmeta"><span class="ppct" id="spct">0%</span><span class="pspd" id="sspd">—</span></div>
+          </div>
+          <div class="fpl" id="fpl"></div>
+        </div>
+      </div>
+
+      <!-- Step 4: Done (peer-to-peer) -->
+      <div class="xs" id="ss4">
+        <div class="card">
+          <div class="dw">
+            <div class="dc">✓</div>
+            <div class="dt">All done!</div>
+            <div class="dp">Files arrived safely.</div><button class="btn bd2" onclick="resetSend()">Send more</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RECEIVE -->
+  <div class="page" id="pg-recv">
+    <div class="xw">
+      <div class="xh"><button class="bk" onclick="goHome()">←</button>
+        <div class="xtit">Receive files</div>
+      </div>
+
+      <div class="xs on" id="rs1">
+        <div class="card">
+          <div class="ct">Enter the code</div>
+          <div class="csu">Ask the sender for their 6-letter code.</div>
+          <div class="nt nb"><span class="ni">💬</span><span>Sender opens Vault → Send files → gets a code → sends it to
+              you.</span></div>
+          <input class="ci" type="text" id="rinput" maxlength="6" placeholder="AAAAAA" autocomplete="off"
+            autocorrect="off" autocapitalize="characters" spellcheck="false"
+            oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'');document.getElementById('rbtn').disabled=this.value.length<4">
+          <button class="btn bd2 mt" id="rbtn" disabled onclick="doConnect()">Connect →</button>
+        </div>
+      </div>
+
+      <div class="xs" id="rs2">
+        <div class="card">
+          <div class="ct">Connecting…</div>
+          <div class="csu">Opening connection to sender.</div>
+          <div id="r-status" class="nt na"><span class="ni"><span class="spin"></span></span><span id="r-st-txt">
+              Connecting…</span></div>
+          <span class="dbg-toggle" onclick="toggleDbg('rdbg')">show debug log</span>
+          <div class="dbg" id="rdbg"></div>
+          <div id="rerr" style="display:none;margin-top:10px;"></div>
+        </div>
+      </div>
+
+      <div class="xs" id="rs3">
+        <div class="card">
+          <div class="ct" id="rtit">Receiving…</div>
+          <div class="csu" id="rsub">Files coming in.</div>
+          <div class="pw" id="rpw" style="display:none">
+            <div class="ptrack">
+              <div class="pfill" id="rpf" style="width:0%"></div>
+            </div>
+            <div class="pmeta"><span class="ppct" id="rpct">0%</span><span class="pspd" id="rspd">—</span></div>
+          </div>
+          <div id="rfl"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ─── Config ──────────────────────────────────────────
+    const WS_URL = (() => {
+      const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
+      return `${proto}//${location.host}`;
+    })();
+
+    let ICE_SERVERS = [
+      { urls: 'stun:stun.l.google.com:19302' },
+      { urls: 'stun:stun1.l.google.com:19302' },
+      { urls: 'turn:a.relay.metered.ca:80', username: 'openrelayproject', credential: 'openrelayproject' },
+      { urls: 'turn:a.relay.metered.ca:80?transport=tcp', username: 'openrelayproject', credential: 'openrelayproject' },
+      { urls: 'turn:a.relay.metered.ca:443', username: 'openrelayproject', credential: 'openrelayproject' },
+      { urls: 'turns:a.relay.metered.ca:443?transport=tcp', username: 'openrelayproject', credential: 'openrelayproject' },
+    ];
+    async function loadIceServers() {
+      try {
+        const r = await fetch('/ice');
+        if (r.ok) {
+          const data = await r.json();
+          if (Array.isArray(data) && data.length > 0) {
+            ICE_SERVERS = data;
+            log('ICE servers loaded: ' + ICE_SERVERS.filter(s => s.urls.startsWith('turn')).map(s => s.urls).join(', '), 'ok');
+          } else {
+            log('ICE endpoint returned invalid data, using defaults', 'err');
+          }
+        }
+      } catch (e) {
+        log('ICE server fetch failed, using defaults', 'err');
+      }
+    }
+
+    const CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    const CHUNK = 65536;
+
+    let ws = null, pc = null, dc = null, role = '', myCode = '';
+    let sFiles = [], sTot = 0, sSent = 0, sStart = 0;
+    let rTot = 0, rGot = 0, rStart = 0;
+    let rFiles = [], rDls = [], rN = 0, rCur = null, rCurIdx = -1;
+    let wsConnectTimeout = null, rtcConnectTimeout = null;
+    let chosenMode = null; // 'link' | 'code'
+    let genLinkUrl = '';
+
+    // ─── DEBUG ───────────────────────────────────────────
+    function log(msg, type = 'info') {
+      const ts = new Date().toLocaleTimeString('en', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      const line = `[${ts}] ${msg}`;
+      console.log(line);
+      ['sdbg', 'rdbg'].forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        const d = document.createElement('p');
+        d.className = 'dbg-line ' + type;
+        d.textContent = line;
+        el.appendChild(d);
+        el.scrollTop = el.scrollHeight;
+      });
+    }
+    function toggleDbg(id) { document.getElementById(id).classList.toggle('show'); }
+
+    // ─── ROUTING ─────────────────────────────────────────
+    function showPage(id) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('on'));
+      document.getElementById('pg-' + id).classList.add('on');
+      window.scrollTo(0, 0);
+    }
+    function sStep(n) {
+      document.querySelectorAll('#pg-send .xs').forEach(x => x.classList.remove('on'));
+      const el = document.getElementById('ss' + n);
+      if (el) el.classList.add('on');
+    }
+    function rStep(n) {
+      document.querySelectorAll('#pg-recv .xs').forEach(x => x.classList.remove('on'));
+      document.getElementById('rs' + n).classList.add('on');
+    }
+    function goHome() {
+      cleanup(); sFiles = []; renderFiles();
+      sStep(1); rStep(1);
+      chosenMode = null;
+      document.getElementById('rinput').value = '';
+      document.getElementById('rbtn').disabled = true;
+      document.getElementById('mc-link').classList.remove('sel');
+      document.getElementById('mc-code').classList.remove('sel');
+      document.getElementById('btn-mode').disabled = true;
+      showPage('home');
+    }
+
+    // ─── CLEANUP ─────────────────────────────────────────
+    function cleanup() {
+      clearTimeout(wsConnectTimeout);
+      clearTimeout(rtcConnectTimeout);
+      if (dc) { try { dc.close(); } catch (e) { } } dc = null;
+      if (pc) { try { pc.close(); } catch (e) { } } pc = null;
+      if (ws) { try { ws.close(); } catch (e) { } } ws = null;
+      role = ''; myCode = '';
+    }
+
+    // ─── FILES ───────────────────────────────────────────
+    function dzO(e) { e.preventDefault(); document.getElementById('dz').classList.add('ov'); }
+    function dzL() { document.getElementById('dz').classList.remove('ov'); }
+    function dzD(e) { e.preventDefault(); dzL(); addFiles(e.dataTransfer.files); }
+    function addFiles(fl) {
+      for (const f of fl) if (!sFiles.find(x => x.name === f.name && x.size === f.size)) sFiles.push(f);
+      renderFiles();
+    }
+    function rmFile(i) { sFiles.splice(i, 1); renderFiles(); }
+    function renderFiles() {
+      document.getElementById('flist').innerHTML = sFiles.map((f, i) => `
+    <div class="fr">
+      <div class="fe">${f.name.split('.').pop().slice(0, 4).toUpperCase()}</div>
+      <div style="flex:1;min-width:0"><div class="fn">${esc(f.name)}</div><div class="fsz">${fmt(f.size)}</div></div>
+      <button class="fdel" onclick="rmFile(${i})">✕</button>
+    </div>`).join('');
+      document.getElementById('btn-go').disabled = sFiles.length === 0;
+    }
+    function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
+    function fmt(b) {
+      if (b < 1024) return b + ' B';
+      if (b < 1048576) return (b / 1024).toFixed(1) + ' KB';
+      if (b < 1073741824) return (b / 1048576).toFixed(1) + ' MB';
+      return (b / 1073741824).toFixed(2) + ' GB';
+    }
+
+    // ─── MODE CHOOSER ────────────────────────────────────
+    function selectMode(m) {
+      chosenMode = m;
+      document.getElementById('mc-link').classList.toggle('sel', m === 'link');
+      document.getElementById('mc-code').classList.toggle('sel', m === 'code');
+      document.getElementById('btn-mode').disabled = false;
+    }
+
+    async function startChosenMode() {
+      if (!chosenMode) return;
+      if (chosenMode === 'link') await initLinkUpload();
+      else await initSend();
+    }
+
+    // ─── LINK UPLOAD ─────────────────────────────────────
+    async function initLinkUpload() {
+      sStep('2a');
+      const fill = document.getElementById('uprog-fill');
+      const label = document.getElementById('uprog-label');
+
+      label.textContent = 'Reading files…';
+      fill.style.width = '5%';
+
+      // Read all files as base64
+      const fileData = [];
+      for (let i = 0; i < sFiles.length; i++) {
+        const f = sFiles[i];
+        label.textContent = `Reading ${f.name}…`;
+        fill.style.width = (5 + (i / sFiles.length) * 40) + '%';
+        const b64 = await readBase64(f);
+        fileData.push({ name: f.name, type: f.type || 'application/octet-stream', data: b64 });
+      }
+
+      label.textContent = 'Uploading to server…';
+      fill.style.width = '55%';
+
+      try {
+        const res = await fetch('/upload', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ files: fileData }),
+        });
+
+        fill.style.width = '90%';
+
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({ error: 'Upload failed' }));
+          throw new Error(err.error || 'Upload failed');
+        }
+
+        const { url } = await res.json();
+        fill.style.width = '100%';
+        label.textContent = 'Done!';
+
+        genLinkUrl = location.origin + url;
+        document.getElementById('gen-link-url').textContent = genLinkUrl;
+        await sleep(300);
+        sStep('2b');
+      } catch (err) {
+        label.textContent = '❌ ' + err.message;
+        fill.style.background = 'var(--rd)';
+        log('Upload error: ' + err.message, 'err');
+      }
+    }
+
+    function readBase64(file) {
+      return new Promise((res, rej) => {
+        const r = new FileReader();
+        r.onload = e => res(e.target.result.split(',')[1]);
+        r.onerror = rej;
+        r.readAsDataURL(file);
+      });
+    }
+
+    function copyLink() {
+      if (!genLinkUrl) return;
+      const fallback = () => {
+        const t = document.createElement('textarea');
+        t.value = genLinkUrl;
+        t.style.cssText = 'position:fixed;opacity:0';
+        document.body.appendChild(t); t.select(); document.execCommand('copy'); t.remove();
+        toast('✓ Link copied!');
+      };
+      if (navigator.clipboard) navigator.clipboard.writeText(genLinkUrl).then(() => toast('✓ Link copied!')).catch(fallback);
+      else fallback();
+    }
+
+    function shareWhatsApp() {
+      if (!genLinkUrl) return;
+      const msg = encodeURIComponent('Here are your files: ' + genLinkUrl);
+      window.open('https://wa.me/?text=' + msg, '_blank');
+    }
+
+    // ─── WEBSOCKET ───────────────────────────────────────
+    function openWS(onOpen) {
+      log('Connecting to signaling server: ' + WS_URL);
+      wsConnectTimeout = setTimeout(() => {
+        log('WebSocket timed out after 10s', 'err');
+        if (role === 'sender') setStatus('s-status', 's-st-txt', 'nr', '❌ Cannot reach server.');
+        else { setRStatus('nr', '❌ Cannot reach server.'); showRErr('Cannot connect. Try reloading.'); }
+      }, 10000);
+
+      ws = new WebSocket(WS_URL);
+      ws.onopen = () => { clearTimeout(wsConnectTimeout); log('WebSocket connected ✓', 'ok'); onOpen(); };
+      ws.onerror = () => {
+        clearTimeout(wsConnectTimeout);
+        const msg = 'WebSocket error — server may be unreachable';
+        log(msg, 'err');
+        if (role === 'sender') setStatus('s-status', 's-st-txt', 'nr', '❌ ' + msg);
+        else showRErr(msg);
+      };
+      ws.onclose = e => log(`WebSocket closed: code=${e.code}`, e.code === 1000 ? 'info' : 'err');
+    }
+
+    function wsSend(msg) {
+      if (ws && ws.readyState === WebSocket.OPEN) { log('→ ' + msg.type); ws.send(JSON.stringify(msg)); }
+      else log('wsSend failed — WS not open', 'err');
+    }
+
+    // ─── SENDER (peer-to-peer) ────────────────────────────
+    async function initSend() {
+      role = 'sender';
+      myCode = randCode();
+      sStep(2);
+      setStatus('s-status', 's-st-txt', 'na', '<span class="spin"></span> Connecting to server…');
+      log('Sender starting, code: ' + myCode);
+      await loadIceServers();
+
+      openWS(() => {
+        wsSend({ type: 'register', room: myCode });
+        ws.onmessage = async (e) => {
+          const msg = JSON.parse(e.data);
+          log('← ' + msg.type + (msg.message ? ' (' + msg.message + ')' : ''), 'info');
+          if (msg.type === 'registered') {
+            document.getElementById('scode').textContent = msg.code;
+            document.getElementById('shint').textContent = 'Tap to copy · Share via WhatsApp';
+            setStatus('s-status', 's-st-txt', 'ng', '✓ Code ready — share it with the receiver');
+            log('Registered with code: ' + msg.code, 'ok');
+          }
+          if (msg.type === 'error' && msg.message === 'code-taken') {
+            myCode = randCode();
+            wsSend({ type: 'register', room: myCode });
+          }
+          if (msg.type === 'receiver-joined') { log('Receiver joined! Creating offer…', 'ok'); await createOffer(); }
+          if (msg.type === 'answer') {
+            log('Got answer SDP', 'ok');
+            try { await pc.setRemoteDescription(new RTCSessionDescription(msg.sdp)); log('Remote desc set ✓', 'ok'); }
+            catch (err) { log('setRemoteDescription failed: ' + err, 'err'); }
+          }
+          if (msg.type === 'ice' && msg.from === 'receiver') {
+            try { await pc.addIceCandidate(new RTCIceCandidate(msg.candidate)); }
+            catch (err) { log('addIceCandidate failed: ' + err, 'err'); }
+          }
+          if (msg.type === 'peer-left') {
+            log('Receiver disconnected', 'err');
+            if (document.getElementById('ss3').classList.contains('on'))
+              setSendStat('⚠️', 'Receiver disconnected', 'They may have closed the window');
+          }
+        };
+      });
+    }
+
+    async function createOffer() {
+      pc = new RTCPeerConnection({ iceServers: ICE_SERVERS });
+      dc = pc.createDataChannel('vault', { ordered: true });
+      setupSendDC();
+      pc.onicecandidate = e => {
+        if (e.candidate) { log('Sending ICE to receiver'); wsSend({ type: 'ice', from: 'sender', candidate: e.candidate }); }
+        else log('ICE gathering complete', 'ok');
+      };
+      pc.oniceconnectionstatechange = () => {
+        log('ICE state: ' + pc.iceConnectionState, pc.iceConnectionState === 'failed' ? 'err' : 'info');
+        if (pc.iceConnectionState === 'failed') setSendStat('❌', 'Connection failed', 'Could not reach receiver');
+      };
+      pc.onconnectionstatechange = () => log('PC state: ' + pc.connectionState, pc.connectionState === 'failed' ? 'err' : 'info');
+      const offer = await pc.createOffer();
+      await pc.setLocalDescription(offer);
+      log('Offer created, sending…', 'ok');
+      wsSend({ type: 'offer', sdp: pc.localDescription });
+    }
+
+    function setupSendDC() {
+      dc.onopen = () => {
+        log('DataChannel open — starting transfer!', 'ok');
+        clearTimeout(rtcConnectTimeout);
+        sStep(3); buildSendUI(); sendAll();
+      };
+      dc.onerror = e => { log('DataChannel error: ' + e, 'err'); setSendStat('❌', 'Transfer error', String(e)); };
+      dc.onclose = () => {
+        log('DataChannel closed', 'info');
+        if (document.getElementById('ss3').classList.contains('on'))
+          setSendStat('⚠️', 'Disconnected', 'Receiver closed the window');
+      };
+    }
+
+    function copyCode() {
+      const code = document.getElementById('scode').textContent.trim();
+      if (!code || code === '······') { toast('Not ready yet'); return; }
+      const fallback = () => {
+        const t = document.createElement('textarea'); t.value = code;
+        t.style.cssText = 'position:fixed;opacity:0'; document.body.appendChild(t);
+        t.select(); document.execCommand('copy'); t.remove();
+        toast('✓ Copied: ' + code);
+      };
+      if (navigator.clipboard) navigator.clipboard.writeText(code).then(() => toast('✓ Copied: ' + code)).catch(fallback);
+      else fallback();
+    }
+
+    // ─── RECEIVER ────────────────────────────────────────
+    async function doConnect() {
+      const code = document.getElementById('rinput').value.trim().toUpperCase();
+      if (code.length < 4) { toast('Enter the full code'); return; }
+      role = 'receiver'; myCode = code;
+      rStep(2);
+      setRStatus('na', '<span class="spin"></span> Connecting to server…');
+      log('Receiver starting, code: ' + code);
+      await loadIceServers();
+
+      openWS(() => {
+        wsSend({ type: 'join', room: code });
+        rtcConnectTimeout = setTimeout(() => {
+          log('No offer in 15s', 'err');
+          showRErr('No response from sender after 15 seconds.<br>Make sure the code is correct and sender still has Vault open.');
+        }, 15000);
+
+        ws.onmessage = async (e) => {
+          const msg = JSON.parse(e.data);
+          log('← ' + msg.type, 'info');
+          if (msg.type === 'room-not-found') {
+            clearTimeout(rtcConnectTimeout);
+            showRErr('Code not found: <strong>' + code + '</strong><br>Check the code is correct and sender still has Vault open.');
+            return;
+          }
+          if (msg.type === 'joined') { log('Joined room, waiting for offer…', 'ok'); setRStatus('na', '<span class="spin"></span> Waiting for sender…'); }
+          if (msg.type === 'offer') {
+            clearTimeout(rtcConnectTimeout);
+            log('Got offer, creating answer…', 'ok');
+            setRStatus('na', '<span class="spin"></span> Establishing connection…');
+            pc = new RTCPeerConnection({ iceServers: ICE_SERVERS });
+            pc.onicecandidate = ev => {
+              if (ev.candidate) { log('Sending ICE to sender'); wsSend({ type: 'ice', from: 'receiver', candidate: ev.candidate }); }
+              else log('ICE gathering complete', 'ok');
+            };
+            pc.oniceconnectionstatechange = () => {
+              log('ICE state: ' + pc.iceConnectionState, pc.iceConnectionState === 'failed' ? 'err' : 'info');
+              if (pc.iceConnectionState === 'failed') showRErr('WebRTC connection failed. Both devices need internet.');
+            };
+            pc.onconnectionstatechange = () => log('PC state: ' + pc.connectionState, pc.connectionState === 'failed' ? 'err' : 'info');
+            pc.ondatachannel = ev => { log('DataChannel received', 'ok'); dc = ev.channel; dc.binaryType = 'arraybuffer'; setupRecvDC(); };
+            try {
+              await pc.setRemoteDescription(new RTCSessionDescription(msg.sdp));
+              log('Remote desc set ✓', 'ok');
+              const answer = await pc.createAnswer();
+              await pc.setLocalDescription(answer);
+              log('Answer sent…', 'ok');
+              wsSend({ type: 'answer', sdp: pc.localDescription });
+            } catch (err) { log('SDP error: ' + err, 'err'); showRErr('WebRTC setup error: ' + err.message); }
+          }
+          if (msg.type === 'ice' && msg.from === 'sender') {
+            try { await pc.addIceCandidate(new RTCIceCandidate(msg.candidate)); }
+            catch (err) { log('addIceCandidate error: ' + err, 'err'); }
+          }
+          if (msg.type === 'peer-left') {
+            clearTimeout(rtcConnectTimeout);
+            if (!document.getElementById('rs3').classList.contains('on'))
+              showRErr('Sender disconnected before files were sent. Ask them to try again.');
+          }
+        };
+      });
+    }
+
+    function setupRecvDC() {
+      dc.onopen = () => {
+        log('DataChannel open — receiving!', 'ok');
+        setRStatus('ng', '✓ Connected! Receiving files…');
+        rStep(3); rStart = Date.now();
+      };
+      dc.onmessage = onData;
+      dc.onerror = e => { log('DataChannel error: ' + e, 'err'); showRErr('Transfer error: ' + e); };
+    }
+
+    // ─── SEND FILES ──────────────────────────────────────
+    async function sendAll() {
+      sTot = sFiles.reduce((a, f) => a + f.size, 0); sSent = 0; sStart = Date.now();
+      dc.send(JSON.stringify({ type: 'count', count: sFiles.length }));
+      await sleep(60);
+      for (let i = 0; i < sFiles.length; i++) await sendOne(sFiles[i], i);
+    }
+    async function sendOne(file, idx) {
+      dc.send(JSON.stringify({ type: 'meta', name: file.name, size: file.size, index: idx }));
+      await sleep(40);
+      let off = 0;
+      while (off < file.size) {
+        while (dc.bufferedAmount > 2 * 1024 * 1024) await sleep(20);
+        const buf = await readBuf(file.slice(off, off + CHUNK));
+        dc.send(buf); off += buf.byteLength; sSent += buf.byteLength;
+        updSend(idx, Math.min(off, file.size), file.size);
+      }
+      dc.send(JSON.stringify({ type: 'done', index: idx }));
+      await sleep(40);
+    }
+    function readBuf(s) { return new Promise((res, rej) => { const r = new FileReader(); r.onload = e => res(e.target.result); r.onerror = rej; r.readAsArrayBuffer(s); }); }
+    function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+    function buildSendUI() {
+      document.getElementById('fpl').innerHTML = sFiles.map((f, i) => `
+    <div class="fpi"><div class="fpr"><span class="fpn">${esc(f.name)}</span><span class="fpp" id="fpp${i}">0%</span></div>
+    <div class="fpt"><div class="fpf" id="fpb${i}" style="width:0%"></div></div></div>`).join('');
+    }
+    function updSend(idx, sent, size) {
+      const fp = size > 0 ? sent / size * 100 : 0;
+      const b = document.getElementById('fpb' + idx); if (b) b.style.width = fp + '%';
+      const p = document.getElementById('fpp' + idx); if (p) p.textContent = fp.toFixed(0) + '%';
+      const tot = sTot > 0 ? sSent / sTot * 100 : 0;
+      document.getElementById('spf').style.width = tot + '%';
+      document.getElementById('spct').textContent = tot.toFixed(1) + '%';
+      const s = (Date.now() - sStart) / 1000;
+      document.getElementById('sspd').textContent = fmt(s > 0 ? sSent / s : 0) + '/s';
+      if (tot >= 100) setTimeout(() => sStep(4), 500);
+    }
+    function setSendStat(ico, h, p) {
+      document.getElementById('sico').textContent = ico;
+      document.getElementById('sh').textContent = h;
+      document.getElementById('sp').textContent = p;
+    }
+    function resetSend() {
+      cleanup(); sFiles = []; renderFiles();
+      chosenMode = null;
+      genLinkUrl = '';
+      document.getElementById('scode').textContent = '······';
+      document.getElementById('shint').textContent = 'Generating…';
+      document.getElementById('uprog-fill').style.width = '0%';
+      document.getElementById('uprog-fill').style.background = '';
+      document.getElementById('uprog-label').textContent = 'Preparing…';
+      document.getElementById('gen-link-url').textContent = '—';
+      document.getElementById('mc-link').classList.remove('sel');
+      document.getElementById('mc-code').classList.remove('sel');
+      document.getElementById('btn-mode').disabled = true;
+      setStatus('s-status', 's-st-txt', 'na', '<span class="spin"></span> Connecting…');
+      sStep(1);
+    }
+
+    // ─── RECEIVE DATA ────────────────────────────────────
+    function onData(e) {
+      if (typeof e.data === 'string') {
+        const m = JSON.parse(e.data);
+        if (m.type === 'count') { rN = m.count; rFiles = []; rDls = []; rTot = 0; rGot = 0; document.getElementById('rpw').style.display = 'block'; }
+        if (m.type === 'meta') {
+          rCurIdx = m.index; rCur = { name: m.name, size: m.size, chunks: [], got: 0 };
+          rFiles[m.index] = rCur; rTot += m.size;
+          addRUI(m.index, m.name, m.size);
+          document.getElementById('rsub').textContent = 'Receiving ' + m.name + '…';
+        }
+        if (m.type === 'done') {
+          const fi = rFiles[m.index];
+          if (fi) {
+            const url = URL.createObjectURL(new Blob(fi.chunks));
+            rDls[m.index] = { url, name: fi.name };
+            enableDL(m.index, url, fi.name); setRBar(m.index, 100);
+            log('File done: ' + fi.name, 'ok');
+            if (rDls.filter(Boolean).length === rN) {
+              document.getElementById('rtit').textContent = '✅ Done!';
+              document.getElementById('rsub').textContent = 'All files received. Tap Save below.';
+            }
+          }
+        }
+      } else {
+        if (rCur) {
+          rCur.chunks.push(e.data); rCur.got += e.data.byteLength; rGot += e.data.byteLength;
+          const tot = rTot > 0 ? rGot / rTot * 100 : 0;
+          document.getElementById('rpf').style.width = tot + '%';
+          document.getElementById('rpct').textContent = tot.toFixed(1) + '%';
+          const s = (Date.now() - rStart) / 1000;
+          document.getElementById('rspd').textContent = fmt(s > 0 ? rGot / s : 0) + '/s';
+          setRBar(rCurIdx, rCur.size > 0 ? rCur.got / rCur.size * 100 : 0);
+        }
+      }
+    }
+    function addRUI(idx, name, size) {
+      const el = document.getElementById('rfl');
+      const d = document.createElement('div'); d.className = 'rf';
+      d.innerHTML = `<div style="font-size:22px;flex-shrink:0">📄</div>
+    <div class="rfi"><div class="rfn">${esc(name)}</div><div class="rfs">${fmt(size)}</div>
+    <div class="rfp"><div class="fpt"><div class="fpf" id="rb${idx}" style="width:0%"></div></div></div></div>
+    <button class="dlb" id="dl${idx}" disabled>↓ Save</button>`;
+      el.appendChild(d);
+    }
+    function setRBar(i, p) { const b = document.getElementById('rb' + i); if (b) b.style.width = p + '%'; }
+    function enableDL(i, url, name) {
+      const b = document.getElementById('dl' + i);
+      if (b) { b.disabled = false; b.onclick = () => { const a = document.createElement('a'); a.href = url; a.download = name; a.click(); }; }
+    }
+
+    // ─── UTILS ───────────────────────────────────────────
+    function randCode() { let c = ''; for (let i = 0; i < 6; i++)c += CHARS[Math.floor(Math.random() * CHARS.length)]; return c; }
+    function setStatus(elId, txtId, cls, html) {
+      const el = document.getElementById(elId); if (!el) return;
+      el.className = 'nt n' + cls;
+      el.innerHTML = '<span class="ni">' + html + '</span>';
+    }
+    function setRStatus(cls, html) {
+      const el = document.getElementById('r-status'); if (!el) return;
+      el.className = 'nt n' + cls;
+      el.innerHTML = '<span class="ni">' + html + '</span>';
+    }
+    function showRErr(msg) {
+      rStep(2);
+      const rs = document.getElementById('r-status');
+      if (rs) rs.style.display = 'none';
+      const el = document.getElementById('rerr');
+      el.style.display = 'block';
+      el.innerHTML = `<div class="nt nr"><span class="ni">❌</span><span>${msg}</span></div>
+    <button class="btn bd2" style="margin-top:8px" onclick="cleanup();rStep(1);document.getElementById('rerr').style.display='none';const rs=document.getElementById('r-status');if(rs)rs.style.display='flex';">← Try again</button>`;
+    }
+    function toast(msg) {
+      document.querySelectorAll('.vmsg').forEach(t => t.remove());
+      const t = document.createElement('div'); t.className = 'vmsg';
+      t.style.cssText = 'position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(10px);background:#0f0f0f;color:#fff;padding:10px 18px;border-radius:100px;font-size:13px;font-weight:600;z-index:9999;opacity:0;transition:all .25s cubic-bezier(.34,1.56,.64,1);max-width:88vw;text-align:center;box-shadow:0 6px 24px rgba(0,0,0,.2);pointer-events:none;';
+      t.textContent = msg; document.body.appendChild(t);
+      requestAnimationFrame(() => { t.style.opacity = '1'; t.style.transform = 'translateX(-50%) translateY(0)'; });
+      setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateX(-50%) translateY(8px)'; setTimeout(() => t.remove(), 300); }, 3200);
+    }
+  </script>
+</body>
+
+</html>

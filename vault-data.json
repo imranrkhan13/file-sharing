@@ -1,0 +1,33 @@
+{
+  "transfers": [
+    {
+      "id": 5,
+      "type": "p2p",
+      "code": "FSPH4W",
+      "token": null,
+      "file_names": "[]",
+      "file_sizes": "[]",
+      "total_size": 0,
+      "sender_ip": "::1",
+      "expires_at": null,
+      "status": "completed",
+      "created_at": "2026-04-01T16:23:22.911Z"
+    },
+    {
+      "id": 6,
+      "type": "p2p",
+      "code": "PE9Q2Z",
+      "token": null,
+      "file_names": "[]",
+      "file_sizes": "[]",
+      "total_size": 0,
+      "sender_ip": "::1",
+      "expires_at": null,
+      "status": "completed",
+      "created_at": "2026-04-01T16:27:45.334Z"
+    }
+  ],
+  "downloads": [],
+  "nextId": 7,
+  "nextDlId": 1
+}

@@ -1,0 +1,17 @@
+{
+  "name": "vault-filetransfer",
+  "version": "1.0.0",
+  "description": "P2P encrypted file transfer",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "ws": "^8.16.0"
+  }
+}

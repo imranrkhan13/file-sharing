@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vault · Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg: #f2f2f0; --w: #fff; --ink: #0f0f0f; --i2: #555; --i3: #999;
+      --bd: #e4e4e0; --ac: #f97316; --gn: #16a34a; --rd: #dc2626;
+      --bl: #2563eb; --sh: 0 2px 8px rgba(0,0,0,.06), 0 0 0 1px rgba(0,0,0,.04);
+    }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--ink); min-height: 100vh; -webkit-font-smoothing: antialiased; }
+
+    /* LOGIN */
+    #login-screen {
+      min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px;
+    }
+    .login-box {
+      background: var(--w); border-radius: 24px; padding: 40px 36px; width: 100%; max-width: 380px;
+      box-shadow: var(--sh);
+    }
+    .login-logo { display: flex; align-items: center; gap: 8px; font-size: 20px; font-weight: 900; margin-bottom: 28px; }
+    .ldot { width: 10px; height: 10px; border-radius: 50%; background: var(--ac); }
+    .login-label { font-size: 13px; font-weight: 600; color: var(--i2); margin-bottom: 6px; }
+    .login-input {
+      width: 100%; padding: 11px 14px; border: 1.5px solid var(--bd); border-radius: 10px;
+      font-family: inherit; font-size: 14px; background: var(--bg); outline: none; transition: border .2s;
+    }
+    .login-input:focus { border-color: var(--ink); }
+    .login-btn {
+      width: 100%; margin-top: 16px; padding: 12px; background: var(--ink); color: #fff;
+      border: none; border-radius: 10px; font-family: inherit; font-size: 14px; font-weight: 700;
+      cursor: pointer; transition: opacity .2s;
+    }
+    .login-btn:hover { opacity: .85; }
+    .login-err { color: var(--rd); font-size: 13px; margin-top: 10px; display: none; }
+
+    /* LAYOUT */
+    #app { display: none; }
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; height: 58px; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between; padding: 0 24px;
+      background: rgba(242,242,240,.94); backdrop-filter: blur(20px); border-bottom: 1px solid var(--bd);
+    }
+    .nav-logo { display: flex; align-items: center; gap: 8px; font-size: 17px; font-weight: 900; }
+    .nav-badge {
+      background: var(--ink); color: #fff; padding: 3px 10px; border-radius: 100px;
+      font-size: 11px; font-weight: 700; letter-spacing: .5px;
+    }
+    .nav-right { display: flex; align-items: center; gap: 10px; }
+    .nav-btn {
+      padding: 7px 14px; border-radius: 100px; border: 1.5px solid var(--bd);
+      font-family: inherit; font-size: 12px; font-weight: 600; cursor: pointer;
+      background: var(--w); transition: all .2s;
+    }
+    .nav-btn:hover { border-color: var(--ink); }
+    main { padding: 78px 24px 48px; max-width: 1100px; margin: 0 auto; }
+
+    /* TABS */
+    .tabs { display: flex; gap: 4px; margin-bottom: 24px; background: var(--w); padding: 4px; border-radius: 12px; width: fit-content; box-shadow: var(--sh); }
+    .tab { padding: 7px 16px; border-radius: 9px; border: none; font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer; background: transparent; color: var(--i2); transition: all .2s; }
+    .tab.on { background: var(--ink); color: #fff; }
+
+    /* STATS GRID */
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 24px; }
+    .stat {
+      background: var(--w); border-radius: 16px; padding: 20px 18px;
+      box-shadow: var(--sh);
+    }
+    .stat-val { font-size: 28px; font-weight: 900; letter-spacing: -1px; }
+    .stat-lbl { font-size: 12px; color: var(--i2); margin-top: 4px; font-weight: 500; }
+    .stat-ico { font-size: 22px; margin-bottom: 10px; }
+
+    /* CARD */
+    .card { background: var(--w); border-radius: 20px; box-shadow: var(--sh); overflow: hidden; }
+    .card-head {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 20px; border-bottom: 1px solid var(--bd); gap: 12px; flex-wrap: wrap;
+    }
+    .card-title { font-size: 15px; font-weight: 800; }
+    .search-bar {
+      padding: 8px 14px; border: 1.5px solid var(--bd); border-radius: 100px;
+      font-family: inherit; font-size: 13px; width: 220px; outline: none;
+      background: var(--bg); transition: border .2s;
+    }
+    .search-bar:focus { border-color: var(--ink); }
+    .filter-sel {
+      padding: 8px 12px; border: 1.5px solid var(--bd); border-radius: 100px;
+      font-family: inherit; font-size: 13px; cursor: pointer; background: var(--bg); outline: none;
+    }
+    .refresh-btn {
+      padding: 8px 14px; border-radius: 100px; border: 1.5px solid var(--bd);
+      font-family: inherit; font-size: 12px; font-weight: 600; cursor: pointer;
+      background: var(--w); transition: all .2s;
+    }
+    .refresh-btn:hover { background: var(--ink); color: #fff; border-color: var(--ink); }
+
+    /* TABLE */
+    .tbl-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th { padding: 10px 16px; text-align: left; font-size: 11px; font-weight: 700; color: var(--i3); text-transform: uppercase; letter-spacing: .5px; border-bottom: 1px solid var(--bd); background: var(--bg); }
+    td { padding: 12px 16px; border-bottom: 1px solid #f5f5f3; vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #fafaf8; }
+
+    .pill {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 3px 9px; border-radius: 100px; font-size: 11px; font-weight: 700;
+    }
+    .pill-p2p { background: #eff6ff; color: #2563eb; }
+    .pill-link { background: #fef3c7; color: #d97706; }
+    .pill-active { background: #f0fdf4; color: #16a34a; }
+    .pill-expired { background: #fef2f2; color: #dc2626; }
+    .pill-completed { background: #f5f3ff; color: #7c3aed; }
+
+    .mono { font-family: 'JetBrains Mono', monospace; font-size: 11px; background: var(--bg); padding: 2px 6px; border-radius: 5px; }
+    .del-btn {
+      padding: 5px 10px; border-radius: 7px; border: none; background: #fef2f2;
+      color: var(--rd); font-size: 11px; font-weight: 700; cursor: pointer; transition: all .2s;
+    }
+    .del-btn:hover { background: var(--rd); color: #fff; }
+
+    .empty { padding: 48px; text-align: center; color: var(--i3); font-size: 14px; }
+    .empty span { font-size: 32px; display: block; margin-bottom: 10px; }
+
+    /* PAGINATION */
+    .pgn { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; border-top: 1px solid var(--bd); font-size: 13px; color: var(--i2); }
+    .pgn-btns { display: flex; gap: 6px; }
+    .pgn-btn {
+      padding: 6px 12px; border-radius: 8px; border: 1.5px solid var(--bd);
+      font-family: inherit; font-size: 12px; font-weight: 600; cursor: pointer;
+      background: var(--w); transition: all .2s;
+    }
+    .pgn-btn:disabled { opacity: .4; cursor: not-allowed; }
+    .pgn-btn:not(:disabled):hover { border-color: var(--ink); }
+
+    /* LOADING */
+    .loading { display: flex; align-items: center; justify-content: center; padding: 48px; gap: 10px; color: var(--i3); }
+    .spin { width: 18px; height: 18px; border: 2.5px solid var(--bd); border-top-color: var(--ink); border-radius: 50%; animation: spin .7s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* TOAST */
+    .toast {
+      position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%) translateY(10px);
+      background: var(--ink); color: #fff; padding: 10px 20px; border-radius: 100px;
+      font-size: 13px; font-weight: 600; z-index: 9999; opacity: 0;
+      transition: all .25s; pointer-events: none; white-space: nowrap;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* NO DB WARNING */
+    .warn-banner {
+      background: #fef3c7; border: 1px solid #fcd34d; border-radius: 12px;
+      padding: 14px 18px; margin-bottom: 20px; font-size: 13px; color: #92400e;
+      display: none;
+    }
+    .warn-banner strong { font-weight: 700; }
+
+    @media (max-width: 600px) {
+      main { padding: 70px 12px 40px; }
+      .search-bar { width: 100%; }
+      .card-head { gap: 8px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo"><span class="ldot"></span>Vault <span style="color:var(--i3);font-weight:500;font-size:14px;margin-left:4px">Admin</span></div>
+    <div class="login-label">Admin Password</div>
+    <input class="login-input" id="pw-input" type="password" placeholder="Enter password…" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="login-btn" onclick="doLogin()">Sign In →</button>
+    <div class="login-err" id="login-err">Wrong password. Try again.</div>
+  </div>
+</div>
+
+<!-- ADMIN APP -->
+<div id="app">
+  <nav>
+    <div class="nav-logo"><span class="ldot"></span>Vault <span class="nav-badge">ADMIN</span></div>
+    <div class="nav-right">
+      <span id="nav-time" style="font-size:12px;color:var(--i3)"></span>
+      <button class="nav-btn" onclick="logout()">Sign Out</button>
+    </div>
+  </nav>
+
+  <main>
+    <div class="warn-banner" id="no-db-warn">
+      <strong>⚠️ Database not available.</strong> Install SQLite to enable tracking: <code>npm install better-sqlite3</code>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats" id="stats-grid">
+      <div class="stat"><div class="stat-ico">📤</div><div class="stat-val" id="s-total">—</div><div class="stat-lbl">Total Transfers</div></div>
+      <div class="stat"><div class="stat-ico">📥</div><div class="stat-val" id="s-dl">—</div><div class="stat-lbl">Total Downloads</div></div>
+      <div class="stat"><div class="stat-ico">💾</div><div class="stat-val" id="s-size">—</div><div class="stat-lbl">Data Transferred</div></div>
+      <div class="stat"><div class="stat-ico">🔗</div><div class="stat-val" id="s-p2p">—</div><div class="stat-lbl">P2P Sessions</div></div>
+      <div class="stat"><div class="stat-ico">📎</div><div class="stat-val" id="s-link">—</div><div class="stat-lbl">Link Shares</div></div>
+      <div class="stat"><div class="stat-ico">📅</div><div class="stat-val" id="s-today">—</div><div class="stat-lbl">Today</div></div>
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs">
+      <button class="tab on" onclick="switchTab('transfers',this)">Transfers</button>
+      <button class="tab" onclick="switchTab('downloads',this)">Downloads</button>
+    </div>
+
+    <!-- TRANSFERS TABLE -->
+    <div id="tab-transfers">
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">All Transfers</div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <input class="search-bar" id="t-search" placeholder="Search files, IPs, codes…" oninput="debounceSearch()">
+            <select class="filter-sel" id="t-type" onchange="loadTransfers(1)">
+              <option value="all">All types</option>
+              <option value="p2p">P2P only</option>
+              <option value="link">Link only</option>
+            </select>
+            <button class="refresh-btn" onclick="loadTransfers()">↻ Refresh</button>
+          </div>
+        </div>
+        <div class="tbl-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th><th>Type</th><th>Code / Token</th><th>Files</th>
+                <th>Size</th><th>Sender IP</th><th>Created</th><th>Status</th><th>DLs</th><th></th>
+              </tr>
+            </thead>
+            <tbody id="t-body"><tr><td colspan="10"><div class="loading"><div class="spin"></div> Loading…</div></td></tr></tbody>
+          </table>
+        </div>
+        <div class="pgn">
+          <span id="t-count">—</span>
+          <div class="pgn-btns">
+            <button class="pgn-btn" id="t-prev" onclick="loadTransfers(tPage-1)">← Prev</button>
+            <button class="pgn-btn" id="t-next" onclick="loadTransfers(tPage+1)">Next →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DOWNLOADS TABLE -->
+    <div id="tab-downloads" style="display:none">
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">Download Log</div>
+          <button class="refresh-btn" onclick="loadDownloads()">↻ Refresh</button>
+        </div>
+        <div class="tbl-wrap">
+          <table>
+            <thead>
+              <tr><th>ID</th><th>File</th><th>Token</th><th>Downloader IP</th><th>Downloaded At</th></tr>
+            </thead>
+            <tbody id="d-body"><tr><td colspan="5"><div class="loading"><div class="spin"></div> Loading…</div></td></tr></tbody>
+          </table>
+        </div>
+        <div class="pgn">
+          <span id="d-count">—</span>
+          <div class="pgn-btns">
+            <button class="pgn-btn" id="d-prev" onclick="loadDownloads(dPage-1)">← Prev</button>
+            <button class="pgn-btn" id="d-next" onclick="loadDownloads(dPage+1)">Next →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  let adminKey = '';
+  let tPage = 1, dPage = 1;
+  let searchTimer = null;
+
+  // ── LOGIN ────────────────────────────────────────────
+  function doLogin() {
+    const pw = document.getElementById('pw-input').value.trim();
+    if (!pw) return;
+    adminKey = pw;
+    fetch('/api/admin/stats', { headers: { 'x-admin-key': pw } })
+      .then(r => {
+        if (r.status === 401) {
+          document.getElementById('login-err').style.display = 'block';
+          adminKey = '';
+        } else {
+          document.getElementById('login-screen').style.display = 'none';
+          document.getElementById('app').style.display = 'block';
+          r.json().then(handleStats);
+          loadTransfers();
+          startClock();
+        }
+      }).catch(() => showToast('Server error'));
+  }
+
+  function logout() {
+    adminKey = '';
+    document.getElementById('login-screen').style.display = 'flex';
+    document.getElementById('app').style.display = 'none';
+    document.getElementById('pw-input').value = '';
+    document.getElementById('login-err').style.display = 'none';
+  }
+
+  // ── CLOCK ────────────────────────────────────────────
+  function startClock() {
+    function tick() {
+      document.getElementById('nav-time').textContent = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', second: '2-digit', day: '2-digit', month: 'short' });
+    }
+    tick(); setInterval(tick, 1000);
+  }
+
+  // ── STATS ────────────────────────────────────────────
+  function handleStats(data) {
+    if (data.error) {
+      document.getElementById('no-db-warn').style.display = 'block';
+      return;
+    }
+    const s = data.stats;
+    document.getElementById('s-total').textContent = s.totalTransfers.toLocaleString();
+    document.getElementById('s-dl').textContent = s.totalDownloads.toLocaleString();
+    document.getElementById('s-size').textContent = fmtSize(s.totalSize || 0);
+    document.getElementById('s-p2p').textContent = s.p2pCount.toLocaleString();
+    document.getElementById('s-link').textContent = s.linkCount.toLocaleString();
+    document.getElementById('s-today').textContent = s.todayTransfers.toLocaleString();
+  }
+
+  function loadStats() {
+    api('/api/admin/stats').then(handleStats).catch(() => {});
+  }
+
+  // ── TABS ─────────────────────────────────────────────
+  function switchTab(name, el) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
+    el.classList.add('on');
+    document.getElementById('tab-transfers').style.display = name === 'transfers' ? 'block' : 'none';
+    document.getElementById('tab-downloads').style.display = name === 'downloads' ? 'block' : 'none';
+    if (name === 'downloads') loadDownloads();
+    if (name === 'transfers') loadTransfers();
+  }
+
+  // ── TRANSFERS ────────────────────────────────────────
+  function debounceSearch() {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => loadTransfers(1), 400);
+  }
+
+  function loadTransfers(page = tPage) {
+    tPage = page;
+    const search = document.getElementById('t-search').value;
+    const type = document.getElementById('t-type').value;
+    let url = `/api/admin/transfers?page=${page}&limit=20&type=${type}`;
+    if (search) url += `&search=${encodeURIComponent(search)}`;
+
+    document.getElementById('t-body').innerHTML = '<tr><td colspan="10"><div class="loading"><div class="spin"></div> Loading…</div></td></tr>';
+
+    api(url).then(data => {
+      if (data.error) { document.getElementById('no-db-warn').style.display = 'block'; document.getElementById('t-body').innerHTML = `<tr><td colspan="10"><div class="empty"><span>⚠️</span>${data.error}</div></td></tr>`; return; }
+      const { rows, total } = data;
+      document.getElementById('t-count').textContent = `${total} records · Page ${page}`;
+      document.getElementById('t-prev').disabled = page <= 1;
+      document.getElementById('t-next').disabled = page * 20 >= total;
+
+      if (!rows.length) { document.getElementById('t-body').innerHTML = '<tr><td colspan="10"><div class="empty"><span>📭</span>No transfers yet</div></td></tr>'; return; }
+      document.getElementById('t-body').innerHTML = rows.map(r => {
+        const names = tryJSON(r.file_names, []);
+        const type = r.type === 'p2p' ? '<span class="pill pill-p2p">P2P</span>' : '<span class="pill pill-link">Link</span>';
+        const status = r.status === 'active' ? '<span class="pill pill-active">active</span>' : r.status === 'expired' ? '<span class="pill pill-expired">expired</span>' : '<span class="pill pill-completed">done</span>';
+        const ref = r.code ? `<span class="mono">${esc(r.code)}</span>` : `<span class="mono">${esc((r.token||'').slice(0,8))}…</span>`;
+        return `<tr>
+          <td style="color:var(--i3);font-size:12px">#${r.id}</td>
+          <td>${type}</td>
+          <td>${ref}</td>
+          <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${names.join(', ')}">${names.join(', ') || '—'}</td>
+          <td>${fmtSize(r.total_size || 0)}</td>
+          <td><span class="mono">${esc(r.sender_ip || '—')}</span></td>
+          <td style="color:var(--i3);font-size:12px">${fmtDate(r.created_at)}</td>
+          <td>${status}</td>
+          <td style="font-weight:700">${r.download_count || 0}</td>
+          <td><button class="del-btn" onclick="delTransfer(${r.id},this)">Delete</button></td>
+        </tr>`;
+      }).join('');
+      loadStats();
+    }).catch(e => showToast('Error: ' + e.message));
+  }
+
+  function delTransfer(id, btn) {
+    if (!confirm('Delete this transfer record?')) return;
+    btn.disabled = true; btn.textContent = '…';
+    api(`/api/admin/transfer/${id}`, 'DELETE').then(r => {
+      if (r.success) { showToast('Deleted ✓'); loadTransfers(); }
+      else showToast('Error: ' + r.error);
+    }).catch(e => showToast('Error: ' + e.message));
+  }
+
+  // ── DOWNLOADS ────────────────────────────────────────
+  function loadDownloads(page = dPage) {
+    dPage = page;
+    document.getElementById('d-body').innerHTML = '<tr><td colspan="5"><div class="loading"><div class="spin"></div> Loading…</div></td></tr>';
+    api(`/api/admin/downloads?page=${page}&limit=20`).then(data => {
+      if (data.error) { document.getElementById('d-body').innerHTML = `<tr><td colspan="5"><div class="empty"><span>⚠️</span>${data.error}</div></td></tr>`; return; }
+      const { rows, total } = data;
+      document.getElementById('d-count').textContent = `${total} records · Page ${page}`;
+      document.getElementById('d-prev').disabled = page <= 1;
+      document.getElementById('d-next').disabled = page * 20 >= total;
+
+      if (!rows.length) { document.getElementById('d-body').innerHTML = '<tr><td colspan="5"><div class="empty"><span>📭</span>No downloads yet</div></td></tr>'; return; }
+      document.getElementById('d-body').innerHTML = rows.map(r => `<tr>
+        <td style="color:var(--i3);font-size:12px">#${r.id}</td>
+        <td style="font-weight:600">${esc(r.file_name || '—')}</td>
+        <td><span class="mono">${esc((r.token||'').slice(0,10))}…</span></td>
+        <td><span class="mono">${esc(r.downloader_ip || '—')}</span></td>
+        <td style="color:var(--i3);font-size:12px">${fmtDate(r.downloaded_at)}</td>
+      </tr>`).join('');
+    }).catch(e => showToast('Error: ' + e.message));
+  }
+
+  // ── UTILS ────────────────────────────────────────────
+  function api(url, method = 'GET') {
+    return fetch(url, { method, headers: { 'x-admin-key': adminKey } }).then(r => r.json());
+  }
+  function fmtSize(b) {
+    if (!b) return '0 B';
+    if (b < 1024) return b + ' B';
+    if (b < 1048576) return (b/1024).toFixed(1) + ' KB';
+    if (b < 1073741824) return (b/1048576).toFixed(1) + ' MB';
+    return (b/1073741824).toFixed(2) + ' GB';
+  }
+  function fmtDate(s) {
+    if (!s) return '—';
+    return new Date(s).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+  }
+  function tryJSON(s, def) { try { return JSON.parse(s); } catch { return def; } }
+  function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;'); }
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+</script>
+</body>
+</html>
